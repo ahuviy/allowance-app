@@ -31,7 +31,7 @@
 			.state('tab', {
 			url: '/tab',
 			abstract: true,
-			templateUrl: 'templates/tabs.html'
+			templateUrl: 'views/tabs.html'
 		})
 
 		.state('tab.parent', {
@@ -40,7 +40,7 @@
 				'parent-tab': {
 					controller: 'ParentCtrl',
 					controllerAs: 'vm',
-					templateUrl: 'templates/tab-parent.html'
+					templateUrl: 'views/tab-parent.html'
 				}
 			}
 		})
@@ -49,7 +49,7 @@
 			url: '/parent/:childId',
 			views: {
 				'parent-tab': {
-					templateUrl: 'templates/parentsChild.html',
+					templateUrl: 'views/parentsChild.html',
 					controller: 'ParentsChildCtrl',
 					controllerAs: 'vm'
 				}
@@ -60,7 +60,7 @@
 			url: '/child',
 			views: {
 				'child-tab': {
-					templateUrl: 'templates/tab-child.html',
+					templateUrl: 'views/tab-child.html',
 					controller: 'ParentCtrl'
 				}
 			}

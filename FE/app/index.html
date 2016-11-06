@@ -17,19 +17,14 @@
       }
     </script>-->
 
-	<link href="lib/ionic/css/ionic.css" rel="stylesheet">
+	<link href="lib/ionic/css/ionic.min.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
 
-	<!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
-
 	<!-- lodash library -->
-<!--	<script src="https://cdn.jsdelivr.net/lodash/4.16.6/lodash.min.js"></script>-->
 	<script src="https://cdn.jsdelivr.net/lodash/4.16.6/lodash.core.min.js"></script>
-	
+
 	<!-- ionic/angularjs js -->
-	<script src="lib/ionic/js/ionic.bundle.js"></script>
+	<script src="lib/ionic/js/ionic.bundle.min.js"></script>
 
 	<!-- cordova script (this will be a 404 during development) -->
 	<script src="cordova.js"></script>
@@ -41,6 +36,7 @@
 	<script src="js/parent.controller.js"></script>
 	<script src="js/children.service.js"></script>
 	<script src="js/parentsChild.controller.js"></script>
+	<script src="js/templates/templates.js"></script>
 </head>
 
 <body ng-app="allowance">
@@ -51,12 +47,16 @@
 		<ion-nav-back-button>
 		</ion-nav-back-button>
 	</ion-nav-bar>
+	
 	<!--
       The views will be rendered in the <ion-nav-view> directive below
       Templates are in the /templates folder (but you could also
       have templates inline in this html file if you'd like).
     -->
 	<ion-nav-view></ion-nav-view>
+
+	<!-- to enable live-reload -->
+	<script src="//localhost:35729/livereload.js"></script>
 </body>
 
 </html>

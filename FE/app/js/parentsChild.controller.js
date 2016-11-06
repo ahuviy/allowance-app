@@ -16,7 +16,7 @@
 		 * The deposit-modal
 		 */
 		
-		$ionicModal.fromTemplateUrl('templates/parent-deposit.html', {
+		$ionicModal.fromTemplateUrl('views/parent-deposit.html', {
 			scope: $scope,
 			animation: 'slide-in-up'
 		}).then(function (modal) {
