@@ -1,0 +1,15 @@
+<ion-view view-title="My Children">
+	<ion-content class="padding">
+
+		<div class="list">
+			<div ng-repeat="child in vm.children">
+				<a class="item" ui-sref="tab.parentsChild({childId: child._id})">
+					{{child.name}}
+				</a>
+			</div>
+		</div>
+
+		<button class="button button-icon icon ion-ios-plus-outline"></button>
+
+	</ion-content>
+</ion-view>
