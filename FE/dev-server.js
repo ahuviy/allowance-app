@@ -5,6 +5,12 @@ var port = process.env.PORT || 3000;
 
 //-----------------------------------------------------------------------------
 
+// check working directory
+process.chdir('FE');
+console.log(process.cwd());
+
+//-----------------------------------------------------------------------------
+
 /**
  * Refer static pages from the /app directory
  */
