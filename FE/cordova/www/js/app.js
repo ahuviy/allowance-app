@@ -25,20 +25,23 @@
 	////////////////////////
 
 	function configStates($stateProvider, $urlRouterProvider) {
-		$stateProvider.state('/', {
-			url: 'home',
-			templateUrl: 'views/parent-home.html',
-			controller: 'ParentCtrl',
+		$urlRouterProvider.otherwise('/');
+		$stateProvider
+			.state('home', {
+				url: '/',
+				templateUrl: 'views/home.html',
+				controller: 'HomeCtrl',
+				controllerAs: 'vm'
+			})
+
+		.state('child', {
+			url: 'child/:childId',
+			templateUrl: 'views/child.html',
+			controller: 'ChildCtrl',
 			controllerAs: 'vm'
 		})
 
-		.state('home.child', {
-			url: ':childId',
-			templateUrl: 'views/parent-child.html',
-			controller: 'ParentsChildCtrl',
-			controllerAs: 'vm'
-		})
-
+		/*
 		// setup an abstract state for the tabs directive
 		.state('tab', {
 			url: '/tab',
@@ -77,9 +80,6 @@
 				}
 			}
 		});
-
-		// if none of the above states are matched, use this as the fallback
-		//		$urlRouterProvider.otherwise('/tab/parent');
-		$urlRouterProvider.otherwise('/');
+		*/
 	}
 }(angular));

@@ -25,15 +25,17 @@
 	////////////////////////
 
 	function configStates($stateProvider, $urlRouterProvider) {
-		$stateProvider.state('home', {
-			url: '/',
-			templateUrl: 'views/home.html',
-			controller: 'HomeCtrl',
-			controllerAs: 'vm'
-		})
-		
+		$urlRouterProvider.otherwise('/');
+		$stateProvider
+			.state('home', {
+				url: '/',
+				templateUrl: 'views/home.html',
+				controller: 'HomeCtrl',
+				controllerAs: 'vm'
+			})
+
 		.state('child', {
-			url: ':childId',
+			url: 'child/:childId',
 			templateUrl: 'views/child.html',
 			controller: 'ChildCtrl',
 			controllerAs: 'vm'
@@ -79,8 +81,5 @@
 			}
 		});
 		*/
-
-		// if none of the above states are matched, use this as the fallback
-		$urlRouterProvider.otherwise('/');
 	}
 }(angular));
