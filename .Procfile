@@ -1,1 +1,1 @@
-web: node FE/dev-server.js
+web: node dev-server.js

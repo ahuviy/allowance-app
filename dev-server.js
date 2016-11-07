@@ -5,16 +5,16 @@ var port = process.env.PORT || 3000;
 
 //-----------------------------------------------------------------------------
 
-// check working directory
-process.chdir('FE');
-console.log(process.cwd());
+// change working directory
+//process.chdir('FE');
+//console.log(process.cwd());
 
 //-----------------------------------------------------------------------------
 
 /**
- * Refer static pages from the /app directory
+ * Refer static pages from the /FE/app directory
  */
-app.use(express.static('app'));
+app.use(express.static('FE/app'));
 
 //-----------------------------------------------------------------------------
 app.listen(port);
