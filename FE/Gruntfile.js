@@ -5,9 +5,20 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-angular-templates');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-
+	grunt.loadNpmTasks('grunt-contrib-compass');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	
 	// configure individual actions/tasks
 	grunt.initConfig({
+		compass: {
+            compile: {
+                options: {
+                    sassDir: 'app/styles',
+                    cssDir: 'app/css',
+                    specify: 'app/styles/**/*.scss'
+                }
+            }
+        },
 		connect: {
 			server: {
 				options: {
@@ -20,13 +31,30 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		copy: {
+			cordova: {
+				files: [
+					{
+						expand: true,
+						cwd: 'app',
+						src: [
+							'js/**/*.js',
+							'css/**/*.css',
+							'assets/**/*',
+							'index.html'
+						],
+						dest: 'cordova/www/'
+					}
+				]
+			}
+		},
 		ngtemplates: {
 			dev: {
 				cwd: 'app',
 				src: 'views/**/*.html',
 				dest: 'app/js/templates/templates.js',
 				options: {
-					module: 'allowance'
+					module: 'app'
 				}
 			},
 			devMinifyHtml: {
@@ -34,7 +62,7 @@ module.exports = function (grunt) {
 				src: 'views/**/*.html',
 				dest: 'app/js/templates/templates.js',
 				options: {
-					module: 'allowance',
+					module: 'app',
 					htmlmin: {
 						collapseBooleanAttributes: true,
 						collapseWhitespace: true,
@@ -52,7 +80,7 @@ module.exports = function (grunt) {
 				src: 'views/**/*.html',
 				dest: 'dist/js/templates/templates.js',
 				options: {
-					module: 'allowance'
+					module: 'app'
 				}
 			},
 			distMinifyHtml: {
@@ -60,7 +88,7 @@ module.exports = function (grunt) {
 				src: 'views/**/*.html',
 				dest: 'dist/js/templates/templates.js',
 				options: {
-					module: 'allowance',
+					module: 'app',
 					htmlmin: {
 						collapseBooleanAttributes: true,
 						collapseWhitespace: true,
@@ -75,13 +103,13 @@ module.exports = function (grunt) {
 			}
 		},
 		watch: {
-			css: {
-				files: ['app/css/**/*.css'],
-				options: {
-					livereload: true
-				},
-				tasks: []
-			},
+			compass: {
+                files: ['app/styles/**/*.scss'],
+                options: {
+                    livereload: true
+                },
+                tasks: ['compass:compile']
+            },
 			gruntfile: {
 				files: ['Gruntfile.js'],
 				options: {
@@ -113,9 +141,16 @@ module.exports = function (grunt) {
 		}
 	});
 
+	// build the app for cordova
+	grunt.registerTask('build:cordova', [
+		'compass:compile',
+		'ngtemplates:dev',
+		'copy:cordova'
+	]);
+	
 	// open front-end server and watch (with livereload) for file changes
 	grunt.registerTask('serve', [
-        'ngtemplates:dev',
+        'build:cordova',
 		'connect',
 		'watch'
     ]);

@@ -1,10 +1,18 @@
 angular.module('app').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('views/child.html',
+  $templateCache.put('views/parent-child.html',
     "<ion-view view-title=\"Expanded View\">\r" +
     "\n" +
     "	<ion-content class=\"padding\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "		<button class=\"button button-clear button-positive\" ui-sref=\"tab.parent\">\r" +
+    "\n" +
+    "			Back\r" +
+    "\n" +
+    "		</button>\r" +
     "\n" +
     "\r" +
     "\n" +
@@ -52,7 +60,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "\n" +
     "			<a class=\"button button-balanced\" ng-click=\"openDepositModal()\">Deposit</a>\r" +
     "\n" +
-    "			<a class=\"button button-assertive\" ng-click=\"openWithdrawModal()\">Withdraw</a>\r" +
+    "			<a class=\"button button-assertive\" ng-click=\"\">Withdraw</a>\r" +
     "\n" +
     "			<a class=\"button button-calm icon ion-gear-a\" ng-click=\"\"></a>\r" +
     "\n" +
@@ -66,7 +74,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/deposit-modal.html',
+  $templateCache.put('views/parent-deposit.html',
     "<ion-modal-view>\r" +
     "\n" +
     "	<ion-header-bar class=\"bar-stable\">\r" +
@@ -117,7 +125,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/home.html',
+  $templateCache.put('views/parent-home.html',
     "<ion-view view-title=\"My Children\">\r" +
     "\n" +
     "	<ion-content class=\"padding\">\r" +
@@ -128,7 +136,9 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "\n" +
     "			<div ng-repeat=\"child in vm.children\">\r" +
     "\n" +
-    "				<a class=\"item\" ui-sref=\"child({childId: child._id})\">\r" +
+    "<!--				<a class=\"item\" ui-sref=\"tab.parentsChild({childId: child._id})\">-->\r" +
+    "\n" +
+    "				<a class=\"item\" ui-sref=\"home.child({childId: child._id})\">\r" +
     "\n" +
     "					{{child.name}}\r" +
     "\n" +
@@ -272,57 +282,6 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "	</ion-tab>\n" +
     "\n" +
     "</ion-tabs>"
-  );
-
-
-  $templateCache.put('views/withdraw-modal.html',
-    "<ion-modal-view>\r" +
-    "\n" +
-    "	<ion-header-bar class=\"bar-stable\">\r" +
-    "\n" +
-    "		<h1 class=\"title\">Make a Deposit</h1>\r" +
-    "\n" +
-    "		<button class=\"button button-clear button-positive\" ng-click=\"closeDepositModal()\">Cancel</button>\r" +
-    "\n" +
-    "	</ion-header-bar>\r" +
-    "\n" +
-    "	<ion-content>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "		<div class=\"list\">\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "			<label class=\"item item-input item-stacked-label\">\r" +
-    "\n" +
-    "				<span class=\"input-label\">Amount to Deposit</span>\r" +
-    "\n" +
-    "				<input type=\"number\">\r" +
-    "\n" +
-    "			</label>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "			<ion-checkbox>Set as Monthly Allowance</ion-checkbox>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "		</div>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "		<button class=\"button button-block button-balanced\" ng-click=\"\">\r" +
-    "\n" +
-    "			Withdraw\r" +
-    "\n" +
-    "		</button>\r" +
-    "\n" +
-    "\r" +
-    "\n" +
-    "	</ion-content>\r" +
-    "\n" +
-    "</ion-modal-view>"
   );
 
 }]);

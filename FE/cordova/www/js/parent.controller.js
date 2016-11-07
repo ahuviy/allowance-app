@@ -1,6 +1,6 @@
 (function (angular) {
 	angular
-		.module('allowance')
+		.module('app')
 		.controller('ParentCtrl', ParentCtrl);
 	
 	ParentCtrl.$inject = ['children', '$state'];

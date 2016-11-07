@@ -1,6 +1,6 @@
 (function (angular) {
 	angular
-		.module('allowance')
+		.module('app')
 		.controller('ParentsChildCtrl', ParentsChildCtrl);
 
 	ParentsChildCtrl.$inject = ['children', '$stateParams', '$ionicModal', '$scope'];

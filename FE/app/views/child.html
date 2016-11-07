@@ -1,10 +1,6 @@
 <ion-view view-title="Expanded View">
 	<ion-content class="padding">
 
-		<button class="button button-clear button-positive" ui-sref="tab.parent">
-			Back
-		</button>
-
 		<div class="card">
 			<div class="item item-divider">
 				{{vm.child.name}}
@@ -27,7 +23,7 @@
 
 		<div class="button-bar">
 			<a class="button button-balanced" ng-click="openDepositModal()">Deposit</a>
-			<a class="button button-assertive" ng-click="">Withdraw</a>
+			<a class="button button-assertive" ng-click="openWithdrawModal()">Withdraw</a>
 			<a class="button button-calm icon ion-gear-a" ng-click=""></a>
 		</div>
 
