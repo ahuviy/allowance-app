@@ -1,0 +1,19 @@
+<ion-modal-view>
+
+	<ion-header-bar class="bar-stable">
+		<h1 class="title">Error</h1>
+		<button class="button button-clear button-positive" ng-click="dismissModal()">Cancel</button>
+	</ion-header-bar>
+
+	<ion-content>
+		<div class="card">
+			<div class="item item-divider assertive">
+				An error occured
+			</div>
+			<div class="item item-text-wrap">
+				{{errorData}}
+			</div>
+		</div>
+	</ion-content>
+
+</ion-modal-view>

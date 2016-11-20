@@ -1,0 +1,65 @@
+<ion-view>
+	<ion-nav-title>
+    	{{vm.createNewAccount ? 'Register' : 'Login'}}
+    </ion-nav-title>
+
+	<ion-nav-buttons side="secondary">
+		<button class="button button-clear button-positive" ng-click="vm.toggleSubmit()">
+			{{vm.createNewAccount ? 'Login' : 'Register'}}
+		</button>
+    </ion-nav-buttons>
+
+	<ion-content class="padding">
+
+		<form 	novalidate
+			   	name="loginForm"
+			   	ng-submit="vm.submit(vm.dataToSubmit)">
+			<div class="list">
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Username</span>
+					<input type="text"
+						   placeholder="Username"
+						   ng-model="vm.dataToSubmit.username"
+						   ng-required="true">
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Password</span>
+					<input type="password"
+						   placeholder="Password"
+						   ng-model="vm.dataToSubmit.password"
+						   ng-required="true">
+				</label>
+
+				<label 	class="item item-input item-floating-label"
+						ng-show="vm.createNewAccount">
+					<span class="input-label">Your Name</span>
+					<input type="text"
+						   placeholder="Your Name"
+						   ng-model="vm.dataToSubmit.name"
+						   ng-required="vm.createNewAccount">
+				</label>
+
+				<label 	class="item item-input item-floating-label"
+						ng-show="vm.createNewAccount">
+					<span class="input-label">Email (optional)</span>
+					<input type="email"
+						   placeholder="Email (optional)"
+						   ng-model="vm.dataToSubmit.email">
+				</label>
+			</div>
+
+			<button type="submit"
+					class="button button-block button-positive"
+					ng-disabled="loginForm.$invalid">
+				{{vm.createNewAccount ? 'Register' : 'Login'}}
+			</button>
+		</form>
+		
+		<div class="list">
+			<label class="item assertive" ng-show="vm.error">
+				Wrong username or password
+			</label>
+		</div>
+	</ion-content>
+</ion-view>

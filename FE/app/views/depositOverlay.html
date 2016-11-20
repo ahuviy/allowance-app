@@ -1,0 +1,50 @@
+<ion-modal-view ng-controller="depositOverlayCtrl as vm">
+	<ion-header-bar class="bar-stable">
+		<h1 class="title">
+			{{vm.dataToSubmit.depositType === 'single' ? 'Make a Deposit' : 'Change Allowance'}}
+		</h1>
+		<button class="button button-clear button-positive" ng-click="dismissModal()">Cancel</button>
+	</ion-header-bar>
+	<ion-content>
+		<form novalidate name="depositForm"
+			  ng-submit="vm.submitDeposit()">
+			<div class="list">
+
+				<label class="item item-input item-stacked-label">
+					<span class="input-label">
+						{{vm.dataToSubmit.depositType === 'single' ? 'Amount to Deposit' : 'Allowance Amount'}}
+					</span>
+					<input type="number"
+						   min="0"
+						   ng-model="vm.dataToSubmit.sum"
+						   ng-required="true">
+				</label>
+
+				<label 	class="item item-input item-stacked-label"
+						ng-show="vm.dataToSubmit.depositType === 'single'">
+					<span class="input-label">Description</span>
+					<input type="text"
+						   ng-model="vm.dataToSubmit.description">
+				</label>
+
+				<label class="item item-input item-select">
+					<div class="input-label">
+						Type of Deposit
+					</div>
+					<select ng-model="vm.dataToSubmit.depositType">
+						<option ng-repeat="type in vm.selectDepositType"
+								value="{{type.value}}">
+							{{type.label}}
+						</option>
+					</select>
+				</label>
+
+			</div>
+
+			<button class="button button-block button-balanced"
+					ng-disabled="depositForm.$invalid">
+				{{vm.dataToSubmit.depositType === 'single' ? 'Deposit' : 'Change Allowance'}}
+			</button>
+		</form>
+	</ion-content>
+</ion-modal-view>

@@ -1,25 +1,24 @@
 {
-	"name": "allowance",
-	"version": "1.0.0",
-	"description": "An app for an allowance bank for children",
-	"main": "Gruntfile.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"engines": {
-		"node": "v6.9.1"
-	},
-	"author": "Ahuvi Yearim",
-	"license": "ISC",
-	"devDependencies": {
-		"grunt": "^1.0.1",
-		"grunt-angular-templates": "^1.1.0",
-		"grunt-contrib-compass": "^1.1.1",
-		"grunt-contrib-connect": "^1.0.2",
-		"grunt-contrib-copy": "^1.0.0",
-		"grunt-contrib-watch": "^1.0.0"
-	},
-	"dependencies": {
-		"express": "^4.14.0"
-	}
+  "name": "allowance-bank",
+  "version": "1.0.0",
+  "description": "An app for an allowance bank for children",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahuviy/allowance-app"
+  },
+  "engines": {
+    "node": "v6.9.1"
+  },
+  "author": "Ahuvi Yearim",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "jsonwebtoken": "^7.1.9",
+    "mongoose": "^4.6.7",
+    "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0"
+  }
 }

@@ -1,7 +1,10 @@
-$font-stack:    Helvetica, sans-serif;
-$primary-color: #333;
+input:disabled {
+	background-color: transparent;
+}
 
-body {
-//  font: 100% $font-stack;
-//  color: $primary-color;
+.ah-right {
+	text-align: right;
+}
+.ah-gray {
+	color: #aaa;
 }

@@ -1,11 +1,10 @@
 (function (angular) {
 	angular
 		.module('app', ['ionic'])
-		.constant('_', window._) // to introduce lodash to DI in controllers/services
 		.run(ionicStartup)
-		.config(configStates);
-
-	////////////////////////
+		.config(configStates)
+		.value('noBEmsg', 'No back-end yet. See mockupMap.js for the correct input to test the API.')
+		.value('_', window._); // to introduce lodash to DI in controllers/services
 
 	function ionicStartup($ionicPlatform) {
 		$ionicPlatform.ready(function () {
@@ -22,24 +21,27 @@
 		});
 	}
 
-	////////////////////////
-
 	function configStates($stateProvider, $urlRouterProvider) {
 		$urlRouterProvider.otherwise('/');
 		$stateProvider
-			.state('home', {
+			.state('login', {
 				url: '/',
+				templateUrl: 'views/login.html',
+				controller: 'LoginCtrl',
+				controllerAs: 'vm'
+			})
+			.state('home', {
+				url: '/home',
 				templateUrl: 'views/home.html',
 				controller: 'HomeCtrl',
 				controllerAs: 'vm'
 			})
-
-		.state('child', {
-			url: 'child/:childId',
-			templateUrl: 'views/child.html',
-			controller: 'ChildCtrl',
-			controllerAs: 'vm'
-		})
+			.state('child', {
+				url: 'child/:childId',
+				templateUrl: 'views/child.html',
+				controller: 'ChildCtrl',
+				controllerAs: 'vm'
+			});
 
 		/*
 		// setup an abstract state for the tabs directive
@@ -56,17 +58,6 @@
 					controller: 'ParentCtrl',
 					controllerAs: 'vm',
 					templateUrl: 'views/tab-parent.html'
-				}
-			}
-		})
-
-		.state('tab.parentsChild', {
-			url: '/parent/:childId',
-			views: {
-				'parent-tab': {
-					templateUrl: 'views/parentsChild.html',
-					controller: 'ParentsChildCtrl',
-					controllerAs: 'vm'
 				}
 			}
 		})

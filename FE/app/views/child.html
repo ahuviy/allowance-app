@@ -1,31 +1,57 @@
-<ion-view view-title="Expanded View">
-	<ion-content class="padding">
+<ion-view>
+	<ion-nav-title>Summary for {{vm.child.name}}</ion-nav-title>
+	
+	<!-- HEADER -->
+	<ion-header-bar align-title="left" class="bar-subheader">
+		<div class="buttons">
+			<button class="button button-clear button-dark">
+				Current Balance: 
+				<span ng-class="{'balanced':vm.child.balance>=0, 'assertive':vm.child.balance<0}">
+					{{vm.child.balance}}
+				</span>
+			</button>
+		</div>
+		<h1 class="title"></h1>
+		<div class="buttons">
+			<button class="button button-clear button-dark">
+				Allowance 
+				<span ng-hide="vm.child.allowance==='none'">
+					({{vm.child.allowance}})
+				</span>
+				<span>: </span>
+				<span ng-class="{'positive':vm.child.allowance !== 'none'}">
+					{{vm.child.allowance === 'none' ? 'none' : vm.child.allowanceAmount}}
+				</span>
+			</button>
+		</div>
+	</ion-header-bar>
 
-		<div class="card">
+	<!-- TRANSACTIONS -->
+	<ion-content class="has-header has-footer">
+		<div class="list">
 			<div class="item item-divider">
-				{{vm.child.name}}
+				Transactions
 			</div>
-			<div class="item item-text-wrap">
-				<ul class="list">
-					<li class="item">
-						Current Balance
-						<span class="badge" ng-class="{'badge-balanced':vm.child.balance>=0, 'badge-assertive':vm.child.balance<0}">
-							{{vm.child.balance}}
-						</span>
-					</li>
-					<li class="item" ng-if="vm.child.allowance">
-						Monthly Allowance
-						<span class="badge badge-positive">{{vm.child.allowanceAmount}}</span>
-					</li>
-				</ul>
-			</div>
+			<ul class="list" collection-repeat="transaction in vm.transactions | orderBy: '-date'">
+				<li class="item">
+					<small class="ah-gray">
+						{{transaction.timestamp | date:'dd.MM.yy'}}
+					</small> &nbsp;&nbsp;{{transaction.description}}
+					<strong class="item-note" ng-class="{'balanced':transaction.type==='deposit', 'assertive':transaction.type==='withdraw'}">
+							<span ng-show="transaction.type==='withdraw'">-</span>{{transaction.sum}}
+					</strong>
+				</li>
+			</ul>
 		</div>
-
-		<div class="button-bar">
-			<a class="button button-balanced" ng-click="openDepositModal()">Deposit</a>
-			<a class="button button-assertive" ng-click="openWithdrawModal()">Withdraw</a>
-			<a class="button button-calm icon ion-gear-a" ng-click=""></a>
-		</div>
-
 	</ion-content>
+
+	<!-- FOOTER -->
+	<ion-footer-bar class="bar-stable">
+		<div class="button-bar">
+			<a class="button button-clear button-balanced" ng-click="vm.openDepositModal()">Deposit</a>
+			<a class="button button-clear button-assertive" ng-click="vm.openWithdrawModal()">Withdraw</a>
+			<a class="button button-clear button-calm icon ion-gear-a" ng-click="vm.openAddChildModal()"></a>
+		</div>
+	</ion-footer-bar>
+
 </ion-view>

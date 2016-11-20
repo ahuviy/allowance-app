@@ -1,0 +1,73 @@
+<ion-modal-view ng-controller="addChildOverlayCtrl as vm">
+
+	<ion-header-bar class="bar-stable">
+		<h1 class="title">{{::vm.title}}</h1>
+		<button class="button button-clear button-positive"
+				ng-click="vm.cancelModal()">
+			Cancel
+		</button>
+	</ion-header-bar>
+
+	<ion-content>
+		 <form novalidate
+			   name="addChildForm"
+			   ng-submit="vm.submitChild()">
+			<div class="list">
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Name</span>
+					<input type="text"
+						   placeholder="Name"
+						   ng-model="vm.dataToSubmit.name"
+						   ng-required="true">
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Password</span>
+					<input type="password"
+						   placeholder="Password"
+						   ng-model="vm.dataToSubmit.password"
+						   ng-required="true">
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Account No.</span>
+					<input disabled
+						   type="number"
+						   placeholder="Account No."
+						   ng-model="vm.dataToSubmit.accountNo">
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Monthly Interest (%)</span>
+					<input type="number"
+						   placeholder="Monthly Interest (%)"
+						   min="0"
+						   ng-model="vm.dataToSubmit.interestRate">
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Monthly Rebate (%)</span>
+					<input type="number"
+						   placeholder="Monthly Rebate (%)"
+						   min="0"
+						   ng-model="vm.dataToSubmit.rebateRate">
+				</label>
+
+			</div>
+
+			<button type="submit"
+					class="button button-block button-positive"
+					ng-disabled="addChildForm.$invalid">
+				{{vm.creatingNewChild ? 'Create' : 'Update'}}
+			</button>
+		</form>
+
+		<button class="button button-block button-assertive"
+				ng-hide="vm.creatingNewChild"
+				ng-click="vm.deleteChild()">
+			Delete
+		</button>
+	</ion-content>
+
+</ion-modal-view>
