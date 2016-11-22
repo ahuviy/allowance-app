@@ -4,5 +4,5 @@
 node_modules/
 platforms/
 plugins/
-.sass-cache/
+FE/.sass-cache/
 ref-data/
