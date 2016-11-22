@@ -12,6 +12,9 @@ var passport = require('passport');
 // load config file
 var config = require('./BE/config');
 
+// load bluebird to enable advanced mongoose promises
+mongoose.Promise = require('bluebird');
+
 //-----------------------------------------------------------------------------
 
 // configure passport authentication

@@ -6,7 +6,7 @@
 	function apiMap() {
 		return {
 			getChildren: {
-				urlTemplate: '/api/children/<%= parentId%>',
+				urlTemplate: '/api/children/<%= parentUsername%>',
 				method: 'GET',
 				event: 'getChildren'
 			},
@@ -16,12 +16,12 @@
 				event: 'getChildById'
 			},
 			addParent: {
-				url: '/api/account/add',
+				url: '/api/register',
 				method: 'POST',
 				event: 'addParent'
 			},
 			addChild: {
-				urlTemplate: '/api/children/<%= parentId%>',
+				urlTemplate: '/api/children/<%= parentUsername%>',
 				method: 'POST',
 				event: 'addChild'
 			},
@@ -51,6 +51,11 @@
 				event: 'loginWithFacebook'
 			},
 			loginWithUsername: {
+				url: '/api/login',
+				method: 'POST',
+				event: 'loginWithUsername'
+			},
+			oldLoginWithUsername: {
 				url: '/api/signup',
 				method: 'POST',
 				event: 'loginWithUsername'

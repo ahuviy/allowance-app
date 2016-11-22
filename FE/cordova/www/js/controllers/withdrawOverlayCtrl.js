@@ -3,36 +3,37 @@
 		.module('app')
 		.controller('withdrawOverlayCtrl', withdrawOverlayCtrl);
 
-	withdrawOverlayCtrl.$inject = ['$scope', 'localStorageSrvc'];
+	withdrawOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc'];
 
-	function withdrawOverlayCtrl($scope, localStorageSrvc) {
-		var parentId = '';
-		var vm = this;
-		vm.submitWithdraw = submitWithdraw;
-		vm.dataToSubmit = {};
+	function withdrawOverlayCtrl(withdrawOverlayCtrl, locStoreSrvc, authSrvc) {
+		var credentials;
+		var $scope = this;
 		
-		activate();
+		init();
 
-		function activate() {
-			parentId = localStorageSrvc.get('parentId', '');
+		function init() {
+			// skip to login if parent is not authenticated
+			authSrvc.redirectToLoginIfNotAuth();
+			
+			credentials = locStoreSrvc.getObject('credentials', {});
 			
 			// reset the data-to-submit
-			vm.dataToSubmit = {
-				userId: $scope.childId, // was injected to the overlay
+			$scope.dataToSubmit = {
+				userId: withdrawOverlayCtrl.childId, // was injected to the overlay
 				type: 'withdraw',
 				description: '',
 				sum: undefined,
-				performedBy: parentId,
+				performedBy: credentials.username,
 				timestamp: undefined
 			};
 		}
 
-		function submitWithdraw() {
+		$scope.submitWithdraw = function () {
 			// set timestamp
-			vm.dataToSubmit.timestamp = Date.parse(new Date()); 
+			$scope.dataToSubmit.timestamp = Date.parse(new Date()); 
 
-			console.log(vm.dataToSubmit, 'submitting withdraw');
-			$scope.resolveModal(vm.dataToSubmit);
-		}
+			console.log($scope.dataToSubmit, 'submitting withdraw');
+			withdrawOverlayCtrl.resolveModal($scope.dataToSubmit);
+		};
 	}
 })(angular);

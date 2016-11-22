@@ -1,55 +1,49 @@
-(function (angular) {
-	angular
-		.module('app')
-		.controller('depositOverlayCtrl', depositOverlayCtrl);
+(function(angular) {
+    angular
+        .module('app')
+        .controller('depositOverlayCtrl', depositOverlayCtrl);
 
-	depositOverlayCtrl.$inject = ['$scope', 'localStorageSrvc'];
+    depositOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc', 'ionErrorHandlerSrvc'];
 
-	function depositOverlayCtrl($scope, localStorageSrvc) {
-		var parentId = '';
-		var vm = this;
-		vm.submitDeposit = submitDeposit;
-		vm.dataToSubmit = {};
-		vm.selectDepositType = []; // config data for the <select> DOM element
+    function depositOverlayCtrl(depositOverlayCtrl, locStoreSrvc, authSrvc, ionErrorHandlerSrvc) {
+        var credentials;
+        var $scope = this;
 
-		activate();
+        init();
 
-		function activate() {
-			parentId = localStorageSrvc.get('parentId', '');
-			
-			// vars for the <select> html element
-			vm.selectDepositType = [
-				{
-					label: 'Normal',
-					value: 'single'
-				},
-				{
-					label: 'Weekly',
-					value: 'weekly'
-				},
-				{
-					label: 'Monthly',
-					value: 'monthly'
-				}];
+        function init() {
+            // skip to login if parent is not authenticated
+            authSrvc.redirectToLoginIfNotAuth();
 
-			// reset the data-to-submit
-			vm.dataToSubmit = {
-				userId: $scope.childId, // was injected to the overlay
-				type: 'deposit',
-				description: '',
-				sum: undefined,
-				performedBy: parentId,
-				timestamp: undefined, // will be set on submission
-				depositType: 'single'
-			};
-		}
+            credentials = locStoreSrvc.getObject('credentials', {});
 
-		function submitDeposit() {
-			// set timestamp
-			vm.dataToSubmit.timestamp = Date.parse(new Date()); 
+            // vars for the <select> html element
+            $scope.selectDepositType = [
+                { label: 'Normal', value: 'single' },
+                { label: 'Weekly', value: 'weekly' },
+                { label: 'Monthly', value: 'monthly' }
+            ];
 
-			console.log(vm.dataToSubmit, 'submitting deposit');
-			$scope.resolveModal(vm.dataToSubmit);
-		}
-	}
+            // reset the data-to-submit
+            $scope.dataToSubmit = {
+                userId: depositOverlayCtrl.childId, // was injected to the overlay
+                type: 'deposit',
+                description: '',
+                sum: undefined,
+                performedBy: credentials.username,
+                timestamp: undefined, // will be set on submission
+                depositType: 'single'
+            };
+        }
+
+        $scope.submitDeposit = function() {
+            ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
+                // set timestamp
+                $scope.dataToSubmit.timestamp = Date.parse(new Date());
+
+                console.log($scope.dataToSubmit, 'submitting deposit');
+                depositOverlayCtrl.resolveModal($scope.dataToSubmit);
+            });
+        };
+    }
 })(angular);

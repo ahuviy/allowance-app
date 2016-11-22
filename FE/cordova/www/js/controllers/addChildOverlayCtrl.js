@@ -1,84 +1,87 @@
-(function (angular) {
-	angular
-		.module('app')
-		.controller('addChildOverlayCtrl', addChildOverlayCtrl);
+(function(angular) {
+    angular
+        .module('app')
+        .controller('addChildOverlayCtrl', addChildOverlayCtrl);
 
-	addChildOverlayCtrl.$inject = ['$scope', 'dataSrvc', '$state'];
+    addChildOverlayCtrl.$inject = ['$scope', 'dataSrvc', 'authSrvc', 'ionErrorHandlerSrvc'];
 
-	function addChildOverlayCtrl($scope, dataSrvc, $state) {
-		var vm = this;
-		vm.title = '';
-		vm.creatingNewChild = false;
-		vm.dataToSubmit = {};
-		vm.submitChild = submitChild;
-		vm.cancelModal = cancelModal;
-		vm.deleteChild = deleteChild;
-		
-		activate();
+    function addChildOverlayCtrl(addChildOverlayCtrl, dataSrvc, authSrvc, ionErrorHandlerSrvc) {
 
-		function activate() {
-			// title could have been injected in the modal to $scope.title
-			vm.title = (typeof $scope.title === 'undefined') ? 'Add Child' : $scope.title;
+        var $scope = this;
 
-			if (typeof $scope.child === 'undefined') {
-				// CREATE A NEW CHILD (if child was not injected in the modal)
-				vm.creatingNewChild = true;
-				vm.dataToSubmit = {
-					interestRate: 0,
-					rebateRate: 0
-				};
+        init();
 
-				// get a new account no. if there is no injected child
-				dataSrvc
-					.api({ type: 'generateNewAccountNumber' })
-					.then(function (res) {
-						console.log(res, 'res');
-						vm.dataToSubmit.accountNo = res.data;
-					});
-			} else {
-				// UPDATE AN EXISTING CHILD
-				vm.creatingNewChild = false;
-				vm.dataToSubmit = $scope.child;
-				vm.dataToSubmit.password = $scope.childPassword;
-				vm.dataToSubmit.accountNo = $scope.childAccountNo;
-			}
-		}
+        function init() {
+            // skip to login if parent is not authenticated
+            authSrvc.redirectToLoginIfNotAuth();
 
-		function submitChild() {
-			// resolve the modal with the submit data
-			$scope.resolveModal(vm.dataToSubmit);
-		}
+            // title could have been injected in the modal
+            $scope.title = (typeof addChildOverlayCtrl.title === 'undefined') ?
+                'Add Child' :
+                addChildOverlayCtrl.title;
 
-		function cancelModal() {
-			if (vm.creatingNewChild) {
-				// cancel the generated account number for re-use
-				dataSrvc
-					.api({
-						type: 'cancelNewAccountNumber',
-						urlObj: { accountNo: vm.dataToSubmit.accountNo },
-						args: { accountNo: vm.dataToSubmit.accountNo }
-					})
-					.then(function (res) { console.log(res, 'res'); });
-			}
-			
-			// cancel the modal
-			$scope.dismissModal();
-		}
+            if (typeof addChildOverlayCtrl.child === 'undefined') {
+                // CREATE A NEW CHILD (if child was not injected in the modal)
+                $scope.creatingNewChild = true;
+                $scope.dataToSubmit = {
+                    interestRate: 0,
+                    rebateRate: 0
+                };
 
-		function deleteChild() {
-			// this function will only be available if updating an existing child
-			// the child data will have been injected in the overlay scope
-			dataSrvc
-				.api({
-					type: 'deleteChild',
-					urlObj: { childId: $scope.child.userId }
-				})
-				.then(function (res) {
-					console.log(res, 'deleteChild-res');
-					
-					// cancel the modal and go to state 'home'
-					$scope.dismissModal('home');
-				});
-		}
-	}
+                // BE: get a new account no.
+                dataSrvc.api({ type: 'generateNewAccountNumber' }).then(function(res) {
+                    console.log(res, 'res');
+                    $scope.dataToSubmit.accountNo = res.data;
+                });
+            } else {
+                // UPDATE AN EXISTING CHILD
+                $scope.creatingNewChild = false;
+                $scope.dataToSubmit = addChildOverlayCtrl.child;
+                $scope.dataToSubmit.password = addChildOverlayCtrl.childPassword;
+                $scope.dataToSubmit.accountNo = addChildOverlayCtrl.childAccountNo;
+            }
+        }
+
+        $scope.submitChild = function() {
+            // resolve the modal with the submit data
+            addChildOverlayCtrl.resolveModal($scope.dataToSubmit);
+        };
+
+        $scope.cancelModal = function() {
+            if ($scope.creatingNewChild) {
+                // BE: recycle the generated account number
+                var apiCfg = {
+                    type: 'cancelNewAccountNumber',
+                    urlObj: { accountNo: $scope.dataToSubmit.accountNo },
+                    args: { accountNo: $scope.dataToSubmit.accountNo }
+                };
+                dataSrvc.api(apiCfg).then(function(res) { console.log(res, 'res'); });
+            }
+
+            // cancel the modal
+            addChildOverlayCtrl.dismissModal();
+        };
+
+        $scope.deleteChild = function() {
+			/**
+			 * This function will only be available if updating an existing
+			 * child. The child data will have been injected in the overlay scope
+			 */
+			var msg = 'Do you want to delete ' + $scope.dataToSubmit.name + '?';
+			ionErrorHandlerSrvc.confirmPopup('Are you sure?', msg, sendDeleteReq);
+		};
+
+        function sendDeleteReq() {
+            var apiCfg = {
+                type: 'deleteChild',
+                urlObj: { childId: addChildOverlayCtrl.child.userId }
+            };
+            dataSrvc.api(apiCfg).then(function(res) {
+                console.log(res, 'deleteChild-res');
+
+                // cancel the modal and go to state 'home'
+                addChildOverlayCtrl.dismissModal('home');
+            });
+        }
+    }
 })(angular);

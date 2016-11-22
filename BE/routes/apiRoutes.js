@@ -101,18 +101,17 @@ router.post('/api/register', (req, res) => {
  * getChildren
  */
 router.get('/api/children/:parentUsername', Verify.verifyParent, (req, res) => {
-    // locate the parent
-    usersModel.findOne({ username: req.params.parentUsername }, (err, parent) => {
-
-        // locate his children via his _id
-        usersModel.find({ parentId: parent._id }, (err, children) => {
-            console.log('performed getChildren db query');
+    
+    // locate the parent, then locate his children via his _id
+    usersModel
+        .findOne({ username: req.params.parentUsername })
+        .then(parent => usersModel.find({ parentId: parent._id }))
+        .then(children => {
             res.status(200).send({
                 children: children,
                 parentName: req.decoded.name
             });
         });
-    });
 });
 
 //-----------------------------------------------------------------------------

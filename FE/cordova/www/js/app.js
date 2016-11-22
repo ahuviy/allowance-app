@@ -2,10 +2,35 @@
 	angular
 		.module('app', ['ionic'])
 		.run(ionicStartup)
+		.run(reEnterLoginSession)
 		.config(configStates)
-		.value('noBEmsg', 'No back-end yet. See mockupMap.js for the correct input to test the API.')
 		.value('_', window._); // to introduce lodash to DI in controllers/services
 
+	///////////
+
+	reEnterLoginSession.$inject = ['$http', 'locStoreSrvc', '$cacheFactory'];
+	
+	/**
+	 * If user credentials are already saved in local-storage, set the token
+	 * as a header for all http requests and cache a global: 'loggedIn' to true
+	 * in a 'login' cache.
+	 */
+	function reEnterLoginSession($http, locStoreSrvc, $cacheFactory) {
+		var credentials = locStoreSrvc.getObject('credentials', null);
+		var loginCache = $cacheFactory('login');
+
+		if (credentials && credentials.username && credentials.token) {
+			$http.defaults.headers.common['x-access-token'] = credentials.token;
+			loginCache.put('loggedIn', true);
+		} else {
+			loginCache.put('loggedIn', false);
+		}
+	}
+
+	///////////
+
+	ionicStartup.$inject = ['$ionicPlatform'];
+	
 	function ionicStartup($ionicPlatform) {
 		$ionicPlatform.ready(function () {
 			// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -21,6 +46,10 @@
 		});
 	}
 
+	///////////
+
+	configStates.$inject = ['$stateProvider', '$urlRouterProvider'];
+	
 	function configStates($stateProvider, $urlRouterProvider) {
 		$urlRouterProvider.otherwise('/');
 		$stateProvider
@@ -28,13 +57,15 @@
 				url: '/',
 				templateUrl: 'views/login.html',
 				controller: 'LoginCtrl',
-				controllerAs: 'vm'
+				controllerAs: 'vm',
+				cache: false
 			})
 			.state('home', {
 				url: '/home',
 				templateUrl: 'views/home.html',
 				controller: 'HomeCtrl',
-				controllerAs: 'vm'
+				controllerAs: 'vm',
+				cache: false
 			})
 			.state('child', {
 				url: 'child/:childId',
@@ -42,35 +73,5 @@
 				controller: 'ChildCtrl',
 				controllerAs: 'vm'
 			});
-
-		/*
-		// setup an abstract state for the tabs directive
-		.state('tab', {
-			url: '/tab',
-			abstract: true,
-			templateUrl: 'views/tabs.html'
-		})
-
-		.state('tab.parent', {
-			url: '/parent',
-			views: {
-				'parent-tab': {
-					controller: 'ParentCtrl',
-					controllerAs: 'vm',
-					templateUrl: 'views/tab-parent.html'
-				}
-			}
-		})
-
-		.state('tab.child', {
-			url: '/child',
-			views: {
-				'child-tab': {
-					templateUrl: 'views/tab-child.html',
-					controller: 'ParentCtrl'
-				}
-			}
-		});
-		*/
 	}
-}(angular));
+} (angular));

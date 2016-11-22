@@ -1,51 +1,61 @@
-(function (angular) {
-	angular
-		.module('app')
-		.controller('HomeCtrl', HomeCtrl);
+(function(angular) {
+    angular
+        .module('app')
+        .controller('HomeCtrl', HomeCtrl);
 
-	HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', 'noBEmsg', '$scope'];
-	
-	function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, noBEmsg, $scope) {
-		var parentId = '';
-		var vm = this;
-		vm.children = [];
-		vm.openAddChildModal = openAddChildModal;
-		
-		
-		// do this whenever (re)-entering the page 
-		$scope.$on('$ionicView.enter', function(e) {
-			activate();
-		});
-		
-		
-		function activate() {
-			parentId = locStoreSrvc.get('parentId', '');
-			dataSrvc
-				.api({
-					type: 'getChildren',
-					urlObj: {parentId: parentId}
-				})
-				.then(function (res) {
-					vm.children = res.data;
-				});
-		}
+    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', '$scope', 'authSrvc', 'ionErrorHandlerSrvc'];
 
-		function openAddChildModal() {
-			ionOverlaySrvc
-				.setOverlay({ type: 'addChild' })
-				.then(apiAddChild);
-		}
+    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, HomeCtrl, authSrvc, ionErrorHandlerSrvc) {
+        var credentials;
+		var $scope = this;
 
-		function apiAddChild(child) {
-			dataSrvc.api({
-				type: 'addChild',
-				args: child,
-				urlObj: {parentId: parentId},
-				specialErrorHandlerData: noBEmsg
-			}).then(function (res) {
-				console.log(res, "res");
-				vm.children.push(res.data);
+        init();
+
+        function init() {
+            // skip to login-view if parent is not authenticated
+            authSrvc.redirectToLoginIfNotAuth();
+
+            // retrieve the parent-credentials and parentName from local-storage
+            credentials = locStoreSrvc.getObject('credentials', {});
+            $scope.parentName = locStoreSrvc.get('parentName');
+
+            // BE: get all the children of this parent
+			var apiCfg = {
+                type: 'getChildren',
+                urlObj: { parentUsername: credentials.username }
+            };
+            dataSrvc.api(apiCfg).then(function(res) {
+				console.log(res.data, 'getChildren-res');
+				$scope.children = res.data.children || [];
+				$scope.parentName = res.data.parentName;
+				
+				// store parent-name in local-storage
+				locStoreSrvc.store('parentName', res.data.parentName);
 			});
-		}
-	}
-}(angular));
+        }
+
+        $scope.logout = function() {
+            ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
+                authSrvc.setLoggedOutState();
+                authSrvc.gotoLogin();
+            });
+        };
+
+        $scope.openAddChildModal = function() {
+            ionOverlaySrvc.setOverlay({ type: 'addChild' }).then(apiAddChild);
+        };
+
+        function apiAddChild(child) {
+            // BE: add child
+            var apiCfg = {
+                type: 'addChild',
+                args: child,
+                urlObj: { parentUsername: credentials.username }
+            };
+            dataSrvc.api(apiCfg).then(function(res) {
+                console.log(res, "res");
+                $scope.children.push(res.data);
+            });
+        }
+    }
+})(angular);

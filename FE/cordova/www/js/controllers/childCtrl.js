@@ -3,129 +3,116 @@
 		.module('app')
 		.controller('ChildCtrl', ChildCtrl);
 
-	ChildCtrl.$inject = ['$stateParams', 'dataSrvc', 'ionOverlaySrvc', 'noBEmsg', '$state'];
+	ChildCtrl.$inject = ['$stateParams', 'dataSrvc', 'ionOverlaySrvc', '$state', 'authSrvc'];
 
-	function ChildCtrl($stateParams, dataSrvc, ionOverlaySrvc, noBEmsg, $state) {
+	function ChildCtrl($stateParams, dataSrvc, ionOverlaySrvc, $state, authSrvc) {
 		var childPassword;
 		var childAccountNo;
-		var vm = this;
-		vm.child = {};
-		vm.transactions = [];
-		vm.openDepositModal = openDepositModal;
-		vm.openWithdrawModal = openWithdrawModal;
-		vm.openAddChildModal = openAddChildModal;
+		var $scope = this;
 		
-		activate();
+		init();
 
-		function activate() {
-			// get child data. (account, user, transactions)
-			dataSrvc
-				.api({
-					type: 'getChildById',
-					urlObj: { childId: $stateParams.childId }
-				})
-				.then(function (res) {
-					console.log(res, 'res');
-					vm.child = res.data.account;
-					vm.transactions = res.data.transactions;
+		function init() {
+			// skip to login if parent is not authenticated
+			authSrvc.redirectToLoginIfNotAuth();
+			
+			// get child data (account, user, transactions)
+			var apiCfg = {
+				type: 'getChildById',
+				urlObj: { childId: $stateParams.childId }
+			};
+			dataSrvc.api(apiCfg).then(function (res) {
+				console.log(res.data, 'res');
+				$scope.child = res.data.account || {};
+				$scope.transactions = res.data.transactions || [];
 
-					// add password and account no. (child username)
-					childPassword = res.data.user.password;
-					childAccountNo = parseInt(res.data.user.username);
-				});
+				// add password and accountNo (child-username)
+				childPassword = res.data.user.password;
+				childAccountNo = parseInt(res.data.user.username);
+			});
 		}
 
-		function openDepositModal() {
-			ionOverlaySrvc
-				.setOverlay({
-					type: 'deposit',
-					inject: {
-						childId: $stateParams.childId
-					}
-				})
-				.then(apiDeposit);
-		}
+		$scope.openDepositModal = function () {
+			var overlayCfg = {
+				type: 'deposit',
+				inject: { childId: $stateParams.childId }
+			};
+			ionOverlaySrvc.setOverlay(overlayCfg).then(apiDeposit);
+		};
 
-		function openWithdrawModal() {
-			ionOverlaySrvc
-				.setOverlay({
+		$scope.openWithdrawModal = function () {
+			var overlayCfg = {
 					type: 'withdraw',
-					inject: {
-						childId: $stateParams.childId
-					}
-				})
-				.then(apiWithdraw);
-		}
+					inject: { childId: $stateParams.childId }
+				};
+			ionOverlaySrvc.setOverlay(overlayCfg).then(apiWithdraw);
+		};
 
-		function openAddChildModal() {
-			ionOverlaySrvc
-				.setOverlay({
-					type: 'addChild',
-					inject: {
-						child: vm.child,
-						childPassword: childPassword,
-						childAccountNo: childAccountNo,
-						title: 'Update ' + vm.child.name
-					}
-				})
-				.then(apiUpdateChild, function (redirect) {
-					if (redirect) $state.go(redirect);
+		$scope.openAddChildModal = function () {
+			var overlayCfg = {
+				type: 'addChild',
+				inject: {
+					child: $scope.child,
+					childPassword: childPassword,
+					childAccountNo: childAccountNo,
+					title: 'Update ' + $scope.child.name
+				}
+			};
+			ionOverlaySrvc.setOverlay(overlayCfg).then(
+				apiUpdateChild,
+				// optional redirect if canceling the modal
+				function (redirect) {
+					if (redirect) { $state.go(redirect); }
 				});
-		}
+		};
 
 		function apiUpdateChild(child) {
+			// BE: to update the child
 			console.log(child, "updateChild-req");
-			dataSrvc
-				.api({
-					type: 'updateChild',
-					args: child,
-					urlObj: { childId: $stateParams.childId },
-					specialErrorHandlerData: noBEmsg
-				})
-				.then(function (res) {
-					// response should contain a success message
-					console.log(res, "updateChild-res");
-					vm.child = child;
-					childPassword = child.password; // in case the password was updated
-				});
+			var apiCfg = {
+				type: 'updateChild',
+				args: child,
+				urlObj: { childId: $stateParams.childId }
+			};
+			dataSrvc.api(apiCfg).then(function (res) {
+				// response should contain a success message
+				console.log(res, "updateChild-res");
+				$scope.child = child;
+				childPassword = child.password; // in case the password was updated
+			});
 		}
 
 		function apiDeposit(depositObj) {
-			dataSrvc.api({
+			// BE: deposit to the child account
+			var apiCfg = {
 				type: 'deposit',
 				args: depositObj,
-				urlObj: {
-					accountId: $stateParams.childId
-				},
-				specialErrorHandlerData: noBEmsg
-			}).then(function (res) {
-				console.log(res, "deposit res");
+				urlObj: { accountId: $stateParams.childId }
+			};
+			dataSrvc.api(apiCfg).then(function (res) {
+				console.log(res, "deposit-res");
 
 				// response data should be:
 				// {account: modifiedChildAccountObj, transaction: lastTransactionData}
-				vm.child = res.data.account;
-				if (res.data.transaction) vm.transactions.push(res.data.transaction);
+				$scope.child = res.data.account;
+				if (res.data.transaction) { $scope.transactions.push(res.data.transaction); }
 			});
 		}
 		
 		function apiWithdraw(withdrawObj) {
-			dataSrvc.api({
+			// BE: withdraw from the child account
+			var apiCfg = {
 				type: 'withdraw',
 				args: withdrawObj,
-				urlObj: {
-					accountId: $stateParams.childId
-				},
-				specialErrorHandlerData: noBEmsg
-			}).then(function (res) {
-				console.log(res, "withdraw res");
-
-				// // response should be the new account details
-				// vm.child = res.data;
+				urlObj: { accountId: $stateParams.childId }
+			};
+			dataSrvc.api(apiCfg).then(function (res) {
+				console.log(res, "withdraw-res");
 
 				// response data should be:
 				// {account: modifiedChildAccountObj, transaction: lastTransactionData}
-				vm.child = res.data.account;
-				if (res.data.transaction) vm.transactions.push(res.data.transaction);
+				$scope.child = res.data.account;
+				if (res.data.transaction) { $scope.transactions.push(res.data.transaction); }
 			});
 		}
 	}
