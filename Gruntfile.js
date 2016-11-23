@@ -1,6 +1,10 @@
 module.exports = function (grunt) {
 	
-	// configure individual actions/tasks
+	// just-in-time loader of grunt-plugins
+	require('jit-grunt')(grunt, {
+		ngtemplates: 'grunt-angular-templates'
+	});
+
 	grunt.initConfig({
 		
 		// global variables for the project
@@ -129,17 +133,6 @@ module.exports = function (grunt) {
 			}
 		}
 	});
-
-//-----------------------------------------------------------------------------
-
-	// load grunt plug-ins
-	grunt.loadNpmTasks('grunt-angular-templates');
-	grunt.loadNpmTasks('grunt-contrib-connect');
-	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-contrib-compass');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-middleware-proxy');
 
 //-----------------------------------------------------------------------------
 

@@ -1,53 +1,49 @@
 /******************************************************************************
- * SERVER BACK-END MAIN-FILE
+ * Server back-end main file
  *****************************************************************************/
 
-// load modules
+/**
+ * Initialize app and load modules
+ */
+
 var express = require('express');
-var mongoose = require('mongoose');
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var passport = require('passport');
-
-// load config file
-var config = require('./BE/config');
-
-// load bluebird to enable advanced mongoose promises
-mongoose.Promise = require('bluebird');
-
-//-----------------------------------------------------------------------------
-
-// configure passport authentication
-var authenticate = require('./BE/authenticate');
-
-//-----------------------------------------------------------------------------
-
-// initialize app and globals
 var app = express();
-var port = process.env.PORT || 3000;
+var morgan = require('morgan');             // enables logging
+var bodyParser = require('body-parser');    // parses json request-bodies
+var config = require('./BE/config');        // contains app global vars
 
 //-----------------------------------------------------------------------------
 
-// open connection to the MongoDB database server
+/**
+ * Initialize MongoDB database
+ */
+
+var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');     // enables advanced mongoose promises
 mongoose.connect(config.mongoUrl);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () { console.log('Connected correctly to MongoDB server'); });
+db.once('open', () => console.log('Connected correctly to MongoDB server'));
 
 //-----------------------------------------------------------------------------
 
-// passport config
+/**
+ * Configure passport authentication
+ */
+
+var passport = require('passport');
+require('./BE/auth-config');    // configures the login strategies
 app.use(passport.initialize());
 
 //-----------------------------------------------------------------------------
 
-// Refer static pages from the /FE/app directory
+// Refer static pages
 app.use(express.static('FE/app'));
 
-//-----------------------------------------------------------------------------
-
-// use some middleware
+// enable server log messages
 app.use(morgan('dev'));
+
+// parse JSON request bodies
 app.use(bodyParser.json());
 
 //-----------------------------------------------------------------------------
@@ -65,5 +61,6 @@ app.use('/', apiRouter);
 //-----------------------------------------------------------------------------
 
 // Open the back-end server
+var port = process.env.PORT || 3000;
 app.listen(port);
-console.log('server running on port ' + port);
+console.log('Server running on port ' + port);

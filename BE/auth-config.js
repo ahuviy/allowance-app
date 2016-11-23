@@ -1,7 +1,7 @@
 /*****************************************************************************
- * CONFIGURE PASSPORT AUTHENTICATION VIA LOCAL-STRATEGY
- * - THIS STRATEGY USES A COMBINATION OF 'PASSPORT', 'PASSPORT-LOCAL',
- *   AND 'PASSPORT-LOCAL-MONGOOSE' MODULES.
+ * Configure passport authentication via local-strategy.
+ * This strategy uses a combination of 'passport', 'passport-local',
+ * and 'passport-local-mongoose' modules
  *****************************************************************************/
 
 /**
