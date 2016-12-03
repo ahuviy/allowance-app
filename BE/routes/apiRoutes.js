@@ -1,20 +1,21 @@
 // get the modules
-var express = require('express');
-var bodyParser = require('body-parser');
-var router = express.Router();
-var passport = require('passport');
+const express = require('express');
+const bodyParser = require('body-parser');
+const router = express.Router();
+const passport = require('passport');
+const Promise = require('bluebird'); // use bluebird promises
 
 // load db-models
-var accountsModel = require('../models/accounts');
-var transactionsModel = require('../models/transactions');
-var usersModel = require('../models/users');
-var uniqueModel = require('../models/uniqueAccountNumbers.js');
+const accountsModel = require('../models/accounts');
+const transactionsModel = require('../models/transactions');
+const usersModel = require('../models/users');
+const uniqueModel = require('../models/uniqueAccountNumbers.js');
 
 // use body-parser middleware to parse json requests
 router.use(bodyParser.json());
 
 // this module manages the JSON web-tokens and verifies user identities
-var Verify = require('../verify');
+const Verify = require('../verify');
 
 /******************************************************************************
  * API
@@ -101,8 +102,6 @@ router.post('/api/register', (req, res) => {
  * getChildren
  */
 router.get('/api/children/:parentUsername', Verify.verifyParent, (req, res) => {
-    
-    // locate the parent, then locate his children via his _id
     usersModel
         .findOne({ username: req.params.parentUsername })
         .then(parent => usersModel.find({ parentId: parent._id }))
@@ -120,25 +119,19 @@ router.get('/api/children/:parentUsername', Verify.verifyParent, (req, res) => {
  * getChildById
  */
 router.get('/api/children/get/:childId', Verify.verifyParent, (req, res) => {
-    // get the child's account
-    accountsModel.findOne({ userId: req.params.childId }, (err, account) => {
-
-        // get the child's transactions array
-        transactionsModel.find({ userId: req.params.childId }, (err, transactions) => {
-            if (err) { console.log('Error looking for the transactions'); }
-
-            // get the child's user-data
-            usersModel.findById(req.params.childId, (err, user) => {
-
-                // respond with {accountObj, transactionsObj, userObj}
-                res.json({
-                    account: account,
-                    transactions: transactions,
-                    user: user
-                });
+    Promise
+        .join(
+        accountsModel.findOne({ userId: req.params.childId }),
+        transactionsModel.find({ userId: req.params.childId }),
+        usersModel.findById(req.params.childId),
+        (account, transactions, user) => {
+            res.json({
+                account: account,
+                transactions: transactions,
+                user: user
             });
-        });
-    });
+        })
+        .catch(err => res.status(500).json(err));
 });
 
 //-----------------------------------------------------------------------------
@@ -147,47 +140,65 @@ router.get('/api/children/get/:childId', Verify.verifyParent, (req, res) => {
  * addChild
  */
 router.post('/api/children/:parentUsername', Verify.verifyParent, (req, res) => {
-    // retrieve parent id
-    usersModel.findOne({ username: req.params.parentUsername }, (err, parent) => {
-        if (err) { res.status(500).json(err); }
-        console.log('retrieved parentId');
+    // find the parent-user
+    var parentPromise = usersModel
+        .findOne({ username: req.params.parentUsername })
+        .catch(err => res.status(500).send({
+            msg: 'error finding parent',
+            err: err
+        }));
 
-        // create a new child (user)
-        //TODOahuvi: check that the username is unique
-        //TODOahuvi: add the childId to the parent-user childrenIds array
-        var newChild = {
-            username: req.body.accountNo, // username is the account no.
-            password: req.body.password,
-            name: req.body.name,
-            type: 'child',
-            childrenIds: [],
-            parentId: parent._id,
-            fbUserId: '',
-            email: ''
-        };
-        usersModel.create(newChild, (err, child) => {
-            if (err) { res.status(500).json(err); }
-            console.log('performed addChild db action');
+    // create the child user
+    var childPromise = parentPromise
+        .then(parent => {
+            var promise = usersModel.create({
+                username: req.body.accountNo, // username is the account no.
+                password: req.body.password,
+                name: req.body.name,
+                type: 'child',
+                childrenIds: [],
+                parentId: parent._id,
+                fbUserId: '',
+                email: ''
+            });
+            return promise;
+        })
+        .catch(err => res.status(500).send({
+            msg: 'error creating child',
+            err: err
+        }));
 
-            // create a new account
-            var newAccount = {
-                userId: child._id, // from the child-account just created
+    // add the childId to the parent-user childrenIds array
+    Promise.join(parentPromise, childPromise, (parent, child) => {
+        parent.childrenIds.push(child._id);
+        parent.save();
+    });
+
+    // create the child account
+    var accountPromise = childPromise
+        .then(child => {
+            var promise = accountsModel.create({
+                userId: child._id, // from the child-user just created
                 name: req.body.name,
                 interestRate: req.body.interestRate,
                 rebateRate: req.body.rebateRate,
                 balance: 0,
                 allowance: 'none',
                 allowanceAmount: 0
-            };
-            accountsModel.create(newAccount, (err, account) => {
-                if (err) { res.status(500).json(err); }
-                console.log('performed add-account db action');
-
-                // respond with newChild data
-                res.status(200).send(child);
             });
-        });
-    });
+            return promise;
+        })
+        .catch(err => res.status(500).send({
+            err: err,
+            msg: 'error creating account'
+        }));
+
+    // respond with the child-user
+    Promise
+        .join(childPromise, accountPromise, (child, account) => {
+            res.status(200).send(child);
+        })
+        .catch(err => res.status(500).send(err));
 });
 
 //-----------------------------------------------------------------------------
@@ -231,35 +242,42 @@ router.post('/api/account/:childId/update', Verify.verifyParent, (req, res) => {
  * deleteChild
  */
 router.get('/api/account/:childId/delete', Verify.verifyParent, (req, res) => {
-    console.log('received deleteChild request');
-
-    // delete child account
-    accountsModel.remove({ userId: req.params.childId }, (err, resp) => {
-        if (err) { res.status(500).json(err); }
-        console.log('removed child account');
-
-        // delete all child transactions
-        transactionsModel.remove({ userId: req.params.childId }, (err, resp) => {
-            if (err) { res.status(500).json(err); }
-            console.log('removed child transactions');
-
-            // recycle the child username (accountNo)
-            usersModel.findById(req.params.childId, (err, user) => {
-                uniqueModel.create({ number: user.username }, (err, uniqueEntry) => {
-                    if (err) { res.status(500).json(err); }
-                    console.log('recycled the child accountNo');
-
-                    // delete child user
-                    usersModel.remove({ _id: req.params.childId }, (err, resp) => {
-                        if (err) { res.status(500).json(err); }
-                        console.log('removed child user');
-
+    var childPromise = usersModel
+        .findById(req.params.childId)
+        .catch(err => res.status(500).send({
+            err: err,
+            msg: 'can not find child'
+        }));
+    var parentPromise = childPromise
+        .then(child => usersModel.findById(child.parentId))
+        .catch(err => res.status(500).send({
+            err: err,
+            msg: 'can not find parent'
+        }));
+    Promise.join(
+        childPromise,
+        parentPromise,
+        (child, parent) => {
+            // remove childId from parent childId array
+            parent.childrenIds = parent.childrenIds.filter(id => id.toString() !== child._id.toString());
+            parent.save();
+            // recycle the account-no
+            uniqueModel.create({ number: child.username });
+        })
+        .catch(err => res.status(500).send({
+            err: err,
+            msg: 'problem in recycling account-no or removing childId from parent array' 
+        }))
+        .then(() => {
+            // delete child account/transactions/user
+            accountsModel.remove({ userId: req.params.childId }, () => {
+                transactionsModel.remove({ userId: req.params.childId }, () => {
+                    usersModel.remove({ _id: req.params.childId }, () => {
                         res.json('successfully deleted child');
                     });
-                });
+                });    
             });
         });
-    });
 });
 
 //-----------------------------------------------------------------------------
@@ -371,11 +389,21 @@ router.post('/api/account/:accountId/withdraw', Verify.verifyParent, (req, res) 
  * INITIALIZE ACCOUNT NUMBER COLLECTION
  * Create a collection of unique account numbers. This is done only once.
  */
-function initAccountNumCollection() {
-    for (var i = 100; i < 300; i++) {
-        uniqueModel.create({ number: i });
+router.get('/api/account/init', (req, res) => {
+    // TODOahuvi: generate using a smart algorithm:
+    // get all the usernames that are numbers.
+    // get all the available account numbers.
+    // generate numbers that don't coincide with the current usernames or available
+    // account numbers.
+    initAccountNumCollection();
+
+    function initAccountNumCollection() {
+        for (var i = 100; i < 300; i++) {
+            uniqueModel.create({ number: i });
+        }
+        res.status(200).send('generated new account numbers');
     }
-}
+});
 
 //-----------------------------------------------------------------------------
 
@@ -384,8 +412,6 @@ function initAccountNumCollection() {
  * generate a new unique account number
  */
 router.get('/api/account/generate', Verify.verifyParent, (req, res) => {
-    //TODOahuvi: generate a smarter solution
-
     // get a unique account number from the unique-model
     uniqueModel.findOne({}, (err, uniqueEntry) => {
         console.log('found a unique-account-number: ' + uniqueEntry.number);
