@@ -4,7 +4,6 @@
         .service('authSrvc', authSrvc);
 
     authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', '$http'];
-
     function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, $http) {
         /**
          * Check the login-cache if the user is already logged-in.

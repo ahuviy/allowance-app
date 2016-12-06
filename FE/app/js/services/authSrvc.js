@@ -3,16 +3,17 @@
         .module('app')
         .service('authSrvc', authSrvc);
 
-    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', '$http'];
+    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', '$http', 'cacheMap', 'routeSrvc'];
+    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, $http, cacheMap, routeSrvc) {
+        var that = this;
 
-    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, $http) {
         /**
          * Check the login-cache if the user is already logged-in.
          * See app.js: 'reEnterLoginSession' for details
          */
         this.isAuthenticated = function () {
-            var loginCache = $cacheFactory.get('login');
-            if (loginCache && loginCache.get('loggedIn') === true) {
+            var loginCache = $cacheFactory.get(cacheMap.login.id);
+            if (loginCache && loginCache.get(cacheMap.login.loggedIn) === true) {
                 return true;
             } else {
                 return false;
@@ -20,33 +21,17 @@
         };
 
         /**
-         * Go to home view, disabling the back-button
-         */
-        this.gotoHome = function () {
-            $ionicHistory.nextViewOptions({ disableBack: true });
-            $state.go('home');
-        };
-
-        /**
-         * Go to login view, disabling the back-button
-         */
-        this.gotoLogin = function () {
-            $ionicHistory.nextViewOptions({ disableBack: true });
-            $state.go('login');
-        };
-
-        /**
          * Go to login view if parent is not logged in
          */
         this.redirectToLoginIfNotAuth = function () {
-            if (!this.isAuthenticated()) { this.gotoLogin(); }
+            if (!that.isAuthenticated()) { routeSrvc.gotoLogin(); }
         };
 
         /**
          * Go to home view if parent is already logged in
          */
         this.redirectToHomeIfAuth = function () {
-            if (this.isAuthenticated()) { this.gotoHome(); }
+            if (that.isAuthenticated()) { routeSrvc.gotoHome(); }
         };
 
         /**
@@ -64,8 +49,8 @@
             });
 
             // 2)
-            var loginCache = $cacheFactory.get('login') || $cacheFactory('login');
-            loginCache.put('loggedIn', true);
+            var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
+            loginCache.put(cacheMap.login.loggedIn, true);
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = credentials.token;
@@ -85,8 +70,8 @@
             locStoreSrvc.remove('parentName');
 
             // 2)
-            var loginCache = $cacheFactory.get('login') || $cacheFactory('login');
-            loginCache.put('loggedIn', false);
+            var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
+            loginCache.put(cacheMap.login.loggedIn, false);
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = undefined;

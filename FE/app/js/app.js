@@ -6,18 +6,15 @@
 		.config(configStates)
 		.value('_', window._); // to introduce lodash to DI in controllers/services
 
-	///////////
-
-	reEnterLoginSession.$inject = ['$http', 'locStoreSrvc', '$cacheFactory'];
-	
 	/**
 	 * If user credentials are already saved in local-storage, set the token
 	 * as a header for all http requests and cache a global: 'loggedIn' to true
 	 * in a 'login' cache.
 	 */
-	function reEnterLoginSession($http, locStoreSrvc, $cacheFactory) {
+	reEnterLoginSession.$inject = ['$http', 'locStoreSrvc', '$cacheFactory', 'cacheMap'];
+	function reEnterLoginSession($http, locStoreSrvc, $cacheFactory, cacheMap) {
 		var credentials = locStoreSrvc.getObject('credentials', null);
-		var loginCache = $cacheFactory('login');
+		var loginCache = $cacheFactory(cacheMap.login.id);
 
 		if (credentials && credentials.username && credentials.token) {
 			$http.defaults.headers.common['x-access-token'] = credentials.token;
@@ -27,10 +24,7 @@
 		}
 	}
 
-	///////////
-
 	ionicStartup.$inject = ['$ionicPlatform'];
-	
 	function ionicStartup($ionicPlatform) {
 		$ionicPlatform.ready(function () {
 			// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -46,10 +40,7 @@
 		});
 	}
 
-	///////////
-
 	configStates.$inject = ['$stateProvider', '$urlRouterProvider'];
-	
 	function configStates($stateProvider, $urlRouterProvider) {
 		$urlRouterProvider.otherwise('/');
 		$stateProvider
