@@ -3,9 +3,9 @@
         .module('app')
         .controller('LoginCtrl', LoginCtrl);
 
-    LoginCtrl.$inject = ['dataSrvc', 'authSrvc', 'ionErrorHandlerSrvc'];
+    LoginCtrl.$inject = ['dataSrvc', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
 
-    function LoginCtrl(dataSrvc, authSrvc, ionErrorHandlerSrvc) {
+    function LoginCtrl(dataSrvc, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
         var $scope = this;
 
         init();
@@ -47,7 +47,7 @@
                     });
 
                     // skip to home
-                    authSrvc.gotoHome();
+                    routeSrvc.gotoHome();
 
                 },
                 function failureCb(err) {
