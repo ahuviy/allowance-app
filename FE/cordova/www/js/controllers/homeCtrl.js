@@ -3,9 +3,8 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', '$scope', 'authSrvc', 'ionErrorHandlerSrvc'];
-
-    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, HomeCtrl, authSrvc, ionErrorHandlerSrvc) {
+    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
+    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
         var credentials;
 		var $scope = this;
 
@@ -16,7 +15,7 @@
             authSrvc.redirectToLoginIfNotAuth();
 
             // retrieve the parent-credentials and parentName from local-storage
-            credentials = locStoreSrvc.getObject('credentials', {});
+            credentials = locStoreSrvc.getObject('credentials');
             $scope.parentName = locStoreSrvc.get('parentName');
 
             // BE: get all the children of this parent
@@ -37,7 +36,7 @@
         $scope.logout = function() {
             ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
                 authSrvc.setLoggedOutState();
-                authSrvc.gotoLogin();
+                routeSrvc.gotoLogin();
             });
         };
 

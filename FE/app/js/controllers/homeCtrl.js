@@ -15,7 +15,7 @@
             authSrvc.redirectToLoginIfNotAuth();
 
             // retrieve the parent-credentials and parentName from local-storage
-            credentials = locStoreSrvc.getObject('credentials', {});
+            credentials = locStoreSrvc.getObject('credentials');
             $scope.parentName = locStoreSrvc.get('parentName');
 
             // BE: get all the children of this parent

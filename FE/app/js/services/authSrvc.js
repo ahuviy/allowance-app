@@ -13,7 +13,7 @@
          */
         this.isAuthenticated = function () {
             var loginCache = $cacheFactory.get(cacheMap.login.id);
-            if (loginCache && loginCache.get(cacheMap.login.loggedIn) === true) {
+            if (loginCache && loginCache.get(cacheMap.login.keys.loggedIn) === true) {
                 return true;
             } else {
                 return false;
@@ -50,7 +50,7 @@
 
             // 2)
             var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
-            loginCache.put(cacheMap.login.loggedIn, true);
+            loginCache.put(cacheMap.login.keys.loggedIn, true);
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = credentials.token;
@@ -71,7 +71,7 @@
 
             // 2)
             var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
-            loginCache.put(cacheMap.login.loggedIn, false);
+            loginCache.put(cacheMap.login.keys.loggedIn, false);
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = undefined;
