@@ -20,7 +20,6 @@
 		 * 2) Attempts to use a previously-cached-response.
 		 * 3) Sends a real HTTP request to the server.
 		 * Note: only supports GET/POST requests.
-		 * 
 		 * @param {Object} cfg Contains the options for the API request:
 		 *   type {String} Specifies the api action to be taken (see apiMap.js).
 		 *   data {Object} The data to pass in POST requests.
@@ -47,10 +46,11 @@
 			var url = reqObj.url || compileUrl(reqObj.urlTemplate, cfg.urlParams);
 			var method = reqObj.method;
 			var data = reqObj.noPayload ? null : cfg.data;
-
+			var responsePromise;
+			
 			// attempt to get a mock response
 			if (_mockupEnabled) {
-				var responsePromise = mockup(url, method, data);
+				responsePromise = mockup(url, method, data);
 				if (responsePromise) {
 					return wrapForErrorHandler(responsePromise);
 				}
