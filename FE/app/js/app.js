@@ -38,7 +38,7 @@
 	reEnterLoginSession.$inject = ['locStoreSrvc', 'locStoreMap', 'authSrvc'];
 	
 	function reEnterLoginSession(locStoreSrvc, locStoreMap, authSrvc) {
-		var credentials = locStoreSrvc.getObject(locStoreMap.credentials);
+		var credentials = locStoreSrvc.get(locStoreMap.credentials);
 		if (credentials && credentials.username && credentials.token) {
 			authSrvc.setLoggedInState(credentials);
 		} else {

@@ -51,7 +51,7 @@
                 credentials.token === undefined) {
                 throw new Error('Bad args were received in setLoggedInState.');
             }
-            locStoreSrvc.storeObject(locStoreMap.credentials, {
+            locStoreSrvc.store(locStoreMap.credentials, {
                 username: credentials.username,
                 token: credentials.token
             });

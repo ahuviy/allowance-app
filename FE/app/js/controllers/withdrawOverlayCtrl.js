@@ -15,7 +15,7 @@
 			// skip to login if parent is not authenticated
 			authSrvc.redirectToLoginIfNotAuth();
 			
-			credentials = locStoreSrvc.getObject(locStoreMap.credentials, {});
+			credentials = locStoreSrvc.get(locStoreMap.credentials, {});
 			
 			// reset the data-to-submit
 			$scope.dataToSubmit = {
