@@ -3,9 +3,9 @@
 		.module('app')
 		.service('dataSrvc', dataSrvc);
 
-	dataSrvc.$inject = ['$rootScope', 'apiMap', 'mockupSrvc', '_', '$http', '$q', 'ionErrorHandlerSrvc', '$cacheFactory', 'cacheMap'];
+	dataSrvc.$inject = ['$rootScope', 'apiMap', 'mockupSrvc', '_', '$http', '$q', 'ionErrorHandlerSrvc', 'cacheSrvc', 'cacheMap'];
 
-	function dataSrvc($rootScope, apiMap, mockupSrvc, _, $http, $q, ionErrorHandlerSrvc, $cacheFactory, cacheMap) {
+	function dataSrvc($rootScope, apiMap, mockupSrvc, _, $http, $q, ionErrorHandlerSrvc, cacheSrvc, cacheMap) {
 		this.api = api;
 		this.getApiUrl = getApiUrl;
 
@@ -51,14 +51,14 @@
 			// attempt to retrieve a previously-cached-response
 			if (cfg.useCachedRes) {
 				var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-				var cachedResponse = $cacheFactory.get(cacheId).get(url);
+				var cachedResponse = cacheSrvc.get(cacheId, url);
 				if (cachedResponse) {
 					responsePromise = asyncRespondFromCache(cachedResponse);
 					return wrapForErrorHandler(responsePromise, cfg);
 				}
 			}
 
-			// make a real HTTP request.
+			// make an HTTP request
 			if (method === 'POST') {
 				responsePromise = $http.post(url, data, cfg.reqConfig);
 			} else if (method === 'GET') {
@@ -83,8 +83,7 @@
 						// save response to cache
 						if (cfg.saveResToCache) {
 							var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-							var cache = $cacheFactory.get(cacheId) || $cacheFactory(cacheId);
-							cache.put(url, response);
+							cacheSrvc.store(cacheId, url, response);
 						}
 
 						if (!cfg.disableBI) {

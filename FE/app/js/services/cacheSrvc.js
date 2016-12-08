@@ -3,38 +3,41 @@
         .module('app')
         .service('cacheSrvc', cacheSrvc);
 
-    cacheSrvc.$inject = ['$cacheFactory'];
-    function cacheSrvc($cacheFactory) {
-
+    cacheSrvc.$inject = ['$cacheFactory', '$q'];
+    function cacheSrvc($cacheFactory, $q) {
+        this.get = get;
+        this.getAsync = getAsync;
+        this.store = store;
+        this.storeAsync = storeAsync;
 
         ////////////////////
 
+        function get(cacheId, key) {
+            return $cacheFactory.get(cacheId).get(key);
+        }
 
-        // var loginCache = $cacheFactory(cacheMap.login.id);
-        // loginCache.put(cacheMap.login.keys.loggedIn, true);
+        function getAsync(cacheId, key) {
+            var defer = $q.defer();
+            var result = $cacheFactory.get(cacheId).get(key);
+            if (result) {
+                defer.resolve(result);
+            } else {
+                defer.reject();
+            }
+            return defer.promise;
+        }
 
+        function store(cacheId, key, value) {
+            var cache = $cacheFactory.get(cacheId) || $cacheFactory(cacheId);
+            cache.put(key, value);
+        }
 
-        // var loginCache = $cacheFactory.get(cacheMap.login.id);
-        //     if (loginCache && loginCache.get(cacheMap.login.keys.loggedIn) === true) {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-
-
-        // var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
-        // loginCache.put(cacheMap.login.keys.loggedIn, true);
-
-
-        /**
-         * Stores a {String} value to local-storage. Note: use this function to
-         * store strings ONLY. For any other data-type, use the storeObject function.
-         * @param {String} key Name of the key in local-storage.
-         * @param {String} value The value to be stored.
-         * @returns {undefined}
-         */
-        function store(key, value) {
-            //$window.localStorage[key] = value;
+        function storeAsync(cacheId, key, value) {
+            var defer = $q.defer();
+            var cache = $cacheFactory.get(cacheId) || $cacheFactory(cacheId);
+            cache.put(key, value);
+            defer.resolve();
+            return defer.promise;
         }
     }
 })(angular);
