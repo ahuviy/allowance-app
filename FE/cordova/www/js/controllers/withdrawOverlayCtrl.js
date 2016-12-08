@@ -3,9 +3,9 @@
 		.module('app')
 		.controller('withdrawOverlayCtrl', withdrawOverlayCtrl);
 
-	withdrawOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc'];
+	withdrawOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'locStoreMap', 'authSrvc'];
 
-	function withdrawOverlayCtrl(withdrawOverlayCtrl, locStoreSrvc, authSrvc) {
+	function withdrawOverlayCtrl(withdrawOverlayCtrl, locStoreSrvc, locStoreMap, authSrvc) {
 		var credentials;
 		var $scope = this;
 		
@@ -15,7 +15,7 @@
 			// skip to login if parent is not authenticated
 			authSrvc.redirectToLoginIfNotAuth();
 			
-			credentials = locStoreSrvc.getObject('credentials', {});
+			credentials = locStoreSrvc.getObject(locStoreMap.credentials, {});
 			
 			// reset the data-to-submit
 			$scope.dataToSubmit = {

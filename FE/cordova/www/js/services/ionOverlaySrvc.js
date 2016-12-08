@@ -33,42 +33,39 @@
 				var err = 'No parameter was supplied to setOverlay.';
 				console.error(err);
 				defer.reject(err);
+			} else {
+				// create a new scope for the modal
+				var overlayScope = $rootScope.$new();
+
+				// inject the contents of 'options.inject' into 'overlayScope'
+				angular.forEach(options.inject, function (value, key) {
+					overlayScope[key] = value;
+				});
+
+				// use this for successful termination of the modal
+				overlayScope.resolveModal = function (data) {
+					defer.resolve(data);
+					overlayScope.modal.remove();
+					overlayScope.$destroy();
+				};
+
+				// use this for un-successful termination of the modal
+				overlayScope.dismissModal = function (data) {
+					defer.reject(data);
+					overlayScope.modal.remove();
+					overlayScope.$destroy();
+				};
+
+				// create the modal in the 'overlayScope' and open it
+				var modalTemplate = ionOverlayMap[options.type];
+				$ionicModal.fromTemplateUrl(modalTemplate.templateUrl, {
+					animation: 'slide-in-up',
+					scope: overlayScope
+				}).then(function (modal) {
+					overlayScope.modal = modal;
+					overlayScope.modal.show();
+				});
 			}
-			// create a new scope for the modal
-			var overlayScope = $rootScope.$new();
-
-			// inject the contents of 'options.inject' into 'overlayScope'
-			angular.forEach(options.inject, function (value, key) {
-				overlayScope[key] = value;
-			});
-			// for (var key in options.inject) {
-			// 	overlayScope[key] = options.inject[key];
-			// }
-
-			// use this for successful termination of the modal
-			overlayScope.resolveModal = function (data) {
-				defer.resolve(data);
-				overlayScope.modal.remove();
-				overlayScope.$destroy();
-			};
-
-			// use this for un-successful termination of the modal
-			overlayScope.dismissModal = function (data) {
-				defer.reject(data);
-				overlayScope.modal.remove();
-				overlayScope.$destroy();
-			};
-
-			// create the modal in the 'overlayScope' and open it
-			var modalTemplate = ionOverlayMap[overlayObj.type];
-			$ionicModal.fromTemplateUrl(modalTemplate.templateUrl, {
-				animation: 'slide-in-up',
-				scope: overlayScope
-			}).then(function (modal) {
-				overlayScope.modal = modal;
-				overlayScope.modal.show();
-			});
-
 			return defer.promise;
 		}
 	}

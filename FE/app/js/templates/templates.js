@@ -2,411 +2,766 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/addChildOverlay.html',
-    "<ion-modal-view ng-controller=\"addChildOverlayCtrl as vm\">\n" +
+    "<ion-modal-view ng-controller=\"addChildOverlayCtrl as vm\">\r" +
     "\n" +
-    "	<ion-header-bar class=\"bar-stable\">\n" +
-    "		<h1 class=\"title\">{{::vm.title}}</h1>\n" +
-    "		<button class=\"button button-clear button-positive\"\n" +
-    "				ng-click=\"vm.cancelModal()\">\n" +
-    "			Cancel\n" +
-    "		</button>\n" +
-    "	</ion-header-bar>\n" +
+    "\r" +
     "\n" +
-    "	<ion-content>\n" +
-    "		 <form novalidate\n" +
-    "			   name=\"addChildForm\"\n" +
-    "			   ng-submit=\"vm.submitChild()\">\n" +
-    "			<div class=\"list\">\n" +
+    "	<ion-header-bar class=\"bar-stable\">\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Name</span>\n" +
-    "					<input type=\"text\"\n" +
-    "						   placeholder=\"Name\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.name\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "		<h1 class=\"title\">{{::vm.title}}</h1>\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Password</span>\n" +
-    "					<input type=\"password\"\n" +
-    "						   placeholder=\"Password\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.password\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "		<button class=\"button button-clear button-positive\"\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Account No.</span>\n" +
-    "					<input disabled\n" +
-    "						   type=\"number\"\n" +
-    "						   placeholder=\"Account No.\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.accountNo\">\n" +
-    "				</label>\n" +
+    "				ng-click=\"vm.cancelModal()\">\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Monthly Interest (%)</span>\n" +
-    "					<input type=\"number\"\n" +
-    "						   placeholder=\"Monthly Interest (%)\"\n" +
-    "						   min=\"0\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.interestRate\">\n" +
-    "				</label>\n" +
+    "			Cancel\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Monthly Rebate (%)</span>\n" +
-    "					<input type=\"number\"\n" +
-    "						   placeholder=\"Monthly Rebate (%)\"\n" +
-    "						   min=\"0\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.rebateRate\">\n" +
-    "				</label>\n" +
+    "		</button>\r" +
     "\n" +
-    "			</div>\n" +
+    "	</ion-header-bar>\r" +
     "\n" +
-    "			<button type=\"submit\"\n" +
-    "					class=\"button button-block button-positive\"\n" +
-    "					ng-disabled=\"addChildForm.$invalid\">\n" +
-    "				{{vm.creatingNewChild ? 'Create' : 'Update'}}\n" +
-    "			</button>\n" +
-    "		</form>\n" +
+    "\r" +
     "\n" +
-    "		<button class=\"button button-block button-assertive\"\n" +
-    "				ng-hide=\"vm.creatingNewChild\"\n" +
-    "				ng-click=\"vm.deleteChild()\">\n" +
-    "			Delete\n" +
-    "		</button>\n" +
-    "	</ion-content>\n" +
+    "	<ion-content>\r" +
+    "\n" +
+    "		 <form novalidate\r" +
+    "\n" +
+    "			   name=\"addChildForm\"\r" +
+    "\n" +
+    "			   ng-submit=\"vm.submitChild()\">\r" +
+    "\n" +
+    "			<div class=\"list\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Name</span>\r" +
+    "\n" +
+    "					<input type=\"text\"\r" +
+    "\n" +
+    "						   placeholder=\"Name\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.name\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Password</span>\r" +
+    "\n" +
+    "					<input type=\"password\"\r" +
+    "\n" +
+    "						   placeholder=\"Password\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.password\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Account No.</span>\r" +
+    "\n" +
+    "					<input disabled\r" +
+    "\n" +
+    "						   type=\"number\"\r" +
+    "\n" +
+    "						   placeholder=\"Account No.\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.accountNo\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Monthly Interest (%)</span>\r" +
+    "\n" +
+    "					<input type=\"number\"\r" +
+    "\n" +
+    "						   placeholder=\"Monthly Interest (%)\"\r" +
+    "\n" +
+    "						   min=\"0\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.interestRate\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Monthly Rebate (%)</span>\r" +
+    "\n" +
+    "					<input type=\"number\"\r" +
+    "\n" +
+    "						   placeholder=\"Monthly Rebate (%)\"\r" +
+    "\n" +
+    "						   min=\"0\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.rebateRate\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			<button type=\"submit\"\r" +
+    "\n" +
+    "					class=\"button button-block button-positive\"\r" +
+    "\n" +
+    "					ng-disabled=\"addChildForm.$invalid\">\r" +
+    "\n" +
+    "				{{vm.creatingNewChild ? 'Create' : 'Update'}}\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</form>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "		<button class=\"button button-block button-assertive\"\r" +
+    "\n" +
+    "				ng-hide=\"vm.creatingNewChild\"\r" +
+    "\n" +
+    "				ng-click=\"vm.deleteChild()\">\r" +
+    "\n" +
+    "			Delete\r" +
+    "\n" +
+    "		</button>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "</ion-modal-view>"
   );
 
 
   $templateCache.put('views/busyIndicatorDrtv.html',
-    "<div ng-hide=\"show === 0\" class=\"busy-indicator\">\n" +
-    "	<div class=\"centered-screen\">\n" +
-    "	<ion-spinner></ion-spinner>\n" +
-    "	</div>\n" +
-    "	<div ng-show=\"progress\" class=\"progress-number\" ng-bind=\"progress + '%' \"></div>\n" +
+    "<div ng-hide=\"show === 0\" class=\"busy-indicator\">\r" +
+    "\n" +
+    "	<div class=\"centered-screen\">\r" +
+    "\n" +
+    "	<ion-spinner></ion-spinner>\r" +
+    "\n" +
+    "	</div>\r" +
+    "\n" +
+    "	<div ng-show=\"progress\" class=\"progress-number\" ng-bind=\"progress + '%' \"></div>\r" +
+    "\n" +
     "</div>"
   );
 
 
   $templateCache.put('views/child.html',
-    "<ion-view>\n" +
-    "	<ion-nav-title>Summary for {{vm.child.name}}</ion-nav-title>\n" +
-    "	\n" +
-    "	<!-- HEADER -->\n" +
-    "	<ion-header-bar align-title=\"left\" class=\"bar-subheader\">\n" +
-    "		<div class=\"buttons\">\n" +
-    "			<button class=\"button button-clear button-dark\">\n" +
-    "				Current Balance: \n" +
-    "				<span ng-class=\"{'balanced':vm.child.balance>=0, 'assertive':vm.child.balance<0}\">\n" +
-    "					{{vm.child.balance}}\n" +
-    "				</span>\n" +
-    "			</button>\n" +
-    "		</div>\n" +
-    "		<h1 class=\"title\"></h1>\n" +
-    "		<div class=\"buttons\">\n" +
-    "			<button class=\"button button-clear button-dark\">\n" +
-    "				Allowance \n" +
-    "				<span ng-hide=\"vm.child.allowance==='none'\">\n" +
-    "					({{vm.child.allowance}})\n" +
-    "				</span>\n" +
-    "				<span>: </span>\n" +
-    "				<span ng-class=\"{'positive':vm.child.allowance !== 'none'}\">\n" +
-    "					{{vm.child.allowance === 'none' ? 'none' : vm.child.allowanceAmount}}\n" +
-    "				</span>\n" +
-    "			</button>\n" +
-    "		</div>\n" +
-    "	</ion-header-bar>\n" +
+    "<ion-view>\r" +
     "\n" +
-    "	<!-- TRANSACTIONS -->\n" +
-    "	<ion-content class=\"has-header has-footer\">\n" +
-    "		<div class=\"list\">\n" +
-    "			<div class=\"item item-divider\">\n" +
-    "				Transactions\n" +
-    "			</div>\n" +
-    "			<ul class=\"list\" collection-repeat=\"transaction in vm.transactions | orderBy: '-date'\">\n" +
-    "				<li class=\"item\">\n" +
-    "					<small class=\"ah-gray\">\n" +
-    "						{{transaction.timestamp | date:'dd.MM.yy'}}\n" +
-    "					</small> &nbsp;&nbsp;{{transaction.description}}\n" +
-    "					<strong class=\"item-note\" ng-class=\"{'balanced':transaction.type==='deposit', 'assertive':transaction.type==='withdraw'}\">\n" +
-    "							<span ng-show=\"transaction.type==='withdraw'\">-</span>{{transaction.sum}}\n" +
-    "					</strong>\n" +
-    "				</li>\n" +
-    "			</ul>\n" +
-    "		</div>\n" +
-    "	</ion-content>\n" +
+    "	<ion-nav-title>Summary for {{vm.child.name}}</ion-nav-title>\r" +
     "\n" +
-    "	<!-- FOOTER -->\n" +
-    "	<ion-footer-bar class=\"bar-stable\">\n" +
-    "		<div class=\"button-bar\">\n" +
-    "			<a class=\"button button-clear button-balanced\" ng-click=\"vm.openDepositModal()\">Deposit</a>\n" +
-    "			<a class=\"button button-clear button-assertive\" ng-click=\"vm.openWithdrawModal()\">Withdraw</a>\n" +
-    "			<a class=\"button button-clear button-calm icon ion-gear-a\" ng-click=\"vm.openAddChildModal()\"></a>\n" +
-    "		</div>\n" +
-    "	</ion-footer-bar>\n" +
+    "	\r" +
+    "\n" +
+    "	<!-- HEADER -->\r" +
+    "\n" +
+    "	<ion-header-bar align-title=\"left\" class=\"bar-subheader\">\r" +
+    "\n" +
+    "		<div class=\"buttons\">\r" +
+    "\n" +
+    "			<button class=\"button button-clear button-dark\">\r" +
+    "\n" +
+    "				Current Balance: \r" +
+    "\n" +
+    "				<span ng-class=\"{'balanced':vm.child.balance>=0, 'assertive':vm.child.balance<0}\">\r" +
+    "\n" +
+    "					{{vm.child.balance}}\r" +
+    "\n" +
+    "				</span>\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "		<h1 class=\"title\"></h1>\r" +
+    "\n" +
+    "		<div class=\"buttons\">\r" +
+    "\n" +
+    "			<button class=\"button button-clear button-dark\">\r" +
+    "\n" +
+    "				Allowance \r" +
+    "\n" +
+    "				<span ng-hide=\"vm.child.allowance==='none'\">\r" +
+    "\n" +
+    "					({{vm.child.allowance}})\r" +
+    "\n" +
+    "				</span>\r" +
+    "\n" +
+    "				<span>: </span>\r" +
+    "\n" +
+    "				<span ng-class=\"{'positive':vm.child.allowance !== 'none'}\">\r" +
+    "\n" +
+    "					{{vm.child.allowance === 'none' ? 'none' : vm.child.allowanceAmount}}\r" +
+    "\n" +
+    "				</span>\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-header-bar>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<!-- TRANSACTIONS -->\r" +
+    "\n" +
+    "	<ion-content class=\"has-header has-footer\">\r" +
+    "\n" +
+    "		<div class=\"list\">\r" +
+    "\n" +
+    "			<div class=\"item item-divider\">\r" +
+    "\n" +
+    "				Transactions\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "			<ul class=\"list\" collection-repeat=\"transaction in vm.transactions | orderBy: '-date'\">\r" +
+    "\n" +
+    "				<li class=\"item\">\r" +
+    "\n" +
+    "					<small class=\"ah-gray\">\r" +
+    "\n" +
+    "						{{transaction.timestamp | date:'dd.MM.yy'}}\r" +
+    "\n" +
+    "					</small> &nbsp;&nbsp;{{transaction.description}}\r" +
+    "\n" +
+    "					<strong class=\"item-note\" ng-class=\"{'balanced':transaction.type==='deposit', 'assertive':transaction.type==='withdraw'}\">\r" +
+    "\n" +
+    "							<span ng-show=\"transaction.type==='withdraw'\">-</span>{{transaction.sum}}\r" +
+    "\n" +
+    "					</strong>\r" +
+    "\n" +
+    "				</li>\r" +
+    "\n" +
+    "			</ul>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<!-- FOOTER -->\r" +
+    "\n" +
+    "	<ion-footer-bar class=\"bar-stable\">\r" +
+    "\n" +
+    "		<div class=\"button-bar\">\r" +
+    "\n" +
+    "			<a class=\"button button-clear button-balanced\" ng-click=\"vm.openDepositModal()\">Deposit</a>\r" +
+    "\n" +
+    "			<a class=\"button button-clear button-assertive\" ng-click=\"vm.openWithdrawModal()\">Withdraw</a>\r" +
+    "\n" +
+    "			<a class=\"button button-clear button-calm icon ion-gear-a\" ng-click=\"vm.openAddChildModal()\"></a>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-footer-bar>\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "</ion-view>"
   );
 
 
   $templateCache.put('views/depositOverlay.html',
-    "<ion-modal-view ng-controller=\"depositOverlayCtrl as vm\">\n" +
-    "	<ion-header-bar class=\"bar-stable\">\n" +
-    "		<h1 class=\"title\">\n" +
-    "			{{vm.dataToSubmit.depositType === 'single' ? 'Make a Deposit' : 'Change Allowance'}}\n" +
-    "		</h1>\n" +
-    "		<button class=\"button button-clear button-positive\" ng-click=\"dismissModal()\">Cancel</button>\n" +
-    "	</ion-header-bar>\n" +
-    "	<ion-content>\n" +
-    "		<form novalidate name=\"depositForm\"\n" +
-    "			  ng-submit=\"vm.submitDeposit()\">\n" +
-    "			<div class=\"list\">\n" +
+    "<ion-modal-view ng-controller=\"depositOverlayCtrl as vm\">\r" +
     "\n" +
-    "				<label class=\"item item-input item-stacked-label\">\n" +
-    "					<span class=\"input-label\">\n" +
-    "						{{vm.dataToSubmit.depositType === 'single' ? 'Amount to Deposit' : 'Allowance Amount'}}\n" +
-    "					</span>\n" +
-    "					<input type=\"number\"\n" +
-    "						   min=\"0\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.sum\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "	<ion-header-bar class=\"bar-stable\">\r" +
     "\n" +
-    "				<label 	class=\"item item-input item-stacked-label\"\n" +
-    "						ng-show=\"vm.dataToSubmit.depositType === 'single'\">\n" +
-    "					<span class=\"input-label\">Description</span>\n" +
-    "					<input type=\"text\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.description\">\n" +
-    "				</label>\n" +
+    "		<h1 class=\"title\">\r" +
     "\n" +
-    "				<label class=\"item item-input item-select\">\n" +
-    "					<div class=\"input-label\">\n" +
-    "						Type of Deposit\n" +
-    "					</div>\n" +
-    "					<select ng-model=\"vm.dataToSubmit.depositType\">\n" +
-    "						<option ng-repeat=\"type in vm.selectDepositType\"\n" +
-    "								value=\"{{type.value}}\">\n" +
-    "							{{type.label}}\n" +
-    "						</option>\n" +
-    "					</select>\n" +
-    "				</label>\n" +
+    "			{{vm.dataToSubmit.depositType === 'single' ? 'Make a Deposit' : 'Change Allowance'}}\r" +
     "\n" +
-    "			</div>\n" +
+    "		</h1>\r" +
     "\n" +
-    "			<button class=\"button button-block button-balanced\"\n" +
-    "					ng-disabled=\"depositForm.$invalid\">\n" +
-    "				{{vm.dataToSubmit.depositType === 'single' ? 'Deposit' : 'Change Allowance'}}\n" +
-    "			</button>\n" +
-    "		</form>\n" +
-    "	</ion-content>\n" +
+    "		<button class=\"button button-clear button-positive\" ng-click=\"dismissModal()\">Cancel</button>\r" +
+    "\n" +
+    "	</ion-header-bar>\r" +
+    "\n" +
+    "	<ion-content>\r" +
+    "\n" +
+    "		<form novalidate name=\"depositForm\"\r" +
+    "\n" +
+    "			  ng-submit=\"vm.submitDeposit()\">\r" +
+    "\n" +
+    "			<div class=\"list\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-stacked-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">\r" +
+    "\n" +
+    "						{{vm.dataToSubmit.depositType === 'single' ? 'Amount to Deposit' : 'Allowance Amount'}}\r" +
+    "\n" +
+    "					</span>\r" +
+    "\n" +
+    "					<input type=\"number\"\r" +
+    "\n" +
+    "						   min=\"0\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.sum\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label 	class=\"item item-input item-stacked-label\"\r" +
+    "\n" +
+    "						ng-show=\"vm.dataToSubmit.depositType === 'single'\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Description</span>\r" +
+    "\n" +
+    "					<input type=\"text\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.description\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-select\">\r" +
+    "\n" +
+    "					<div class=\"input-label\">\r" +
+    "\n" +
+    "						Type of Deposit\r" +
+    "\n" +
+    "					</div>\r" +
+    "\n" +
+    "					<select ng-model=\"vm.dataToSubmit.depositType\">\r" +
+    "\n" +
+    "						<option ng-repeat=\"type in vm.selectDepositType\"\r" +
+    "\n" +
+    "								value=\"{{type.value}}\">\r" +
+    "\n" +
+    "							{{type.label}}\r" +
+    "\n" +
+    "						</option>\r" +
+    "\n" +
+    "					</select>\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			<button class=\"button button-block button-balanced\"\r" +
+    "\n" +
+    "					ng-disabled=\"depositForm.$invalid\">\r" +
+    "\n" +
+    "				{{vm.dataToSubmit.depositType === 'single' ? 'Deposit' : 'Change Allowance'}}\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</form>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-modal-view>"
   );
 
 
   $templateCache.put('views/errorOverlay.html',
-    "<ion-modal-view>\n" +
+    "<ion-modal-view>\r" +
     "\n" +
-    "	<ion-header-bar class=\"bar-stable\">\n" +
-    "		<h1 class=\"title\">Error</h1>\n" +
-    "		<button class=\"button button-clear button-positive\" ng-click=\"dismissModal()\">Cancel</button>\n" +
-    "	</ion-header-bar>\n" +
+    "\r" +
     "\n" +
-    "	<ion-content>\n" +
-    "		<div class=\"card\">\n" +
-    "			<div class=\"item item-divider assertive\">\n" +
-    "				An error occured\n" +
-    "			</div>\n" +
-    "			<div class=\"item item-text-wrap\">\n" +
-    "				{{errorData}}\n" +
-    "			</div>\n" +
-    "		</div>\n" +
-    "	</ion-content>\n" +
+    "	<ion-header-bar class=\"bar-stable\">\r" +
+    "\n" +
+    "		<h1 class=\"title\">Error</h1>\r" +
+    "\n" +
+    "		<button class=\"button button-clear button-positive\" ng-click=\"dismissModal()\">Cancel</button>\r" +
+    "\n" +
+    "	</ion-header-bar>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<ion-content>\r" +
+    "\n" +
+    "		<div class=\"card\">\r" +
+    "\n" +
+    "			<div class=\"item item-divider assertive\">\r" +
+    "\n" +
+    "				An error occured\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "			<div class=\"item item-text-wrap\">\r" +
+    "\n" +
+    "				{{errorData}}\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "</ion-modal-view>"
   );
 
 
   $templateCache.put('views/home.html',
-    "<ion-view>\n" +
-    "	<ion-nav-title>{{vm.parentName}}</ion-nav-title>\n" +
+    "<ion-view>\r" +
     "\n" +
-    "	<ion-nav-buttons side=\"primary\">\n" +
-    "		<button class=\"button button-icon icon ion-ios-plus-outline\"\n" +
-    "				ng-click=\"vm.openAddChildModal()\"></button>\n" +
-    "    </ion-nav-buttons>\n" +
-    "	<ion-nav-buttons side=\"secondary\">\n" +
-    "		<button class=\"button button-clear button-assertive\" ng-click=\"vm.logout()\">Log Out</button>\n" +
-    "    </ion-nav-buttons>\n" +
-    "	\n" +
-    "	<ion-content class=\"padding\">\n" +
+    "	<ion-nav-title>{{vm.parentName}}</ion-nav-title>\r" +
     "\n" +
-    "		<div class=\"list\">\n" +
-    "			<div ng-repeat=\"child in vm.children track by child._id\">\n" +
-    "				<a 	class=\"item\"\n" +
-    "					ui-sref=\"child({childId: child._id})\">\n" +
-    "					{{::child.name}}\n" +
-    "				</a>\n" +
-    "			</div>\n" +
-    "		</div>\n" +
+    "\r" +
     "\n" +
-    "	</ion-content>\n" +
+    "	<ion-nav-buttons side=\"primary\">\r" +
+    "\n" +
+    "		<button class=\"button button-icon icon ion-ios-plus-outline\"\r" +
+    "\n" +
+    "				ng-click=\"vm.openAddChildModal()\"></button>\r" +
+    "\n" +
+    "    </ion-nav-buttons>\r" +
+    "\n" +
+    "	<ion-nav-buttons side=\"secondary\">\r" +
+    "\n" +
+    "		<button class=\"button button-clear button-assertive\" ng-click=\"vm.logout()\">Log Out</button>\r" +
+    "\n" +
+    "    </ion-nav-buttons>\r" +
+    "\n" +
+    "	\r" +
+    "\n" +
+    "	<ion-content class=\"padding\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "		<div class=\"list\">\r" +
+    "\n" +
+    "			<div ng-repeat=\"child in vm.children track by child._id\">\r" +
+    "\n" +
+    "				<a 	class=\"item\"\r" +
+    "\n" +
+    "					ui-sref=\"child({childId: child._id})\">\r" +
+    "\n" +
+    "					{{::child.name}}\r" +
+    "\n" +
+    "				</a>\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-view>"
   );
 
 
   $templateCache.put('views/login.html',
-    "<ion-view>\n" +
-    "	<ion-nav-title>\n" +
-    "    	{{vm.createNewAccount ? 'Register' : 'Login'}}\n" +
-    "    </ion-nav-title>\n" +
+    "<ion-view>\r" +
     "\n" +
-    "	<ion-nav-buttons side=\"secondary\">\n" +
-    "		<button class=\"button button-clear button-positive\" ng-click=\"vm.toggleSubmit()\">\n" +
-    "			{{vm.createNewAccount ? 'Login' : 'Register'}}\n" +
-    "		</button>\n" +
-    "    </ion-nav-buttons>\n" +
+    "	<ion-nav-title>\r" +
     "\n" +
-    "	<ion-content class=\"padding\">\n" +
+    "    	{{vm.createNewAccount ? 'Register' : 'Login'}}\r" +
     "\n" +
-    "		<form 	novalidate\n" +
-    "			   	name=\"loginForm\"\n" +
-    "			   	ng-submit=\"vm.submit(vm.dataToSubmit)\">\n" +
-    "			<div class=\"list\">\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Username</span>\n" +
-    "					<input type=\"text\"\n" +
-    "						   placeholder=\"Username\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.username\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "    </ion-nav-title>\r" +
     "\n" +
-    "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Password</span>\n" +
-    "					<input type=\"password\"\n" +
-    "						   placeholder=\"Password\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.password\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "\r" +
     "\n" +
-    "				<label 	class=\"item item-input item-floating-label\"\n" +
-    "						ng-show=\"vm.createNewAccount\">\n" +
-    "					<span class=\"input-label\">Your Name</span>\n" +
-    "					<input type=\"text\"\n" +
-    "						   placeholder=\"Your Name\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.name\"\n" +
-    "						   ng-required=\"vm.createNewAccount\">\n" +
-    "				</label>\n" +
+    "	<ion-nav-buttons side=\"secondary\">\r" +
     "\n" +
-    "				<label 	class=\"item item-input item-floating-label\"\n" +
-    "						ng-show=\"vm.createNewAccount\">\n" +
-    "					<span class=\"input-label\">Email (optional)</span>\n" +
-    "					<input type=\"email\"\n" +
-    "						   placeholder=\"Email (optional)\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.email\">\n" +
-    "				</label>\n" +
-    "			</div>\n" +
+    "		<button class=\"button button-clear button-positive\" ng-click=\"vm.toggleSubmit()\">\r" +
     "\n" +
-    "			<button type=\"submit\"\n" +
-    "					class=\"button button-block button-positive\"\n" +
-    "					ng-disabled=\"loginForm.$invalid\">\n" +
-    "				{{vm.createNewAccount ? 'Register' : 'Login'}}\n" +
-    "			</button>\n" +
-    "		</form>\n" +
-    "		\n" +
-    "		<div class=\"list\">\n" +
-    "			<label class=\"item assertive\" ng-show=\"vm.error\">\n" +
-    "				Wrong username or password\n" +
-    "			</label>\n" +
-    "		</div>\n" +
-    "	</ion-content>\n" +
+    "			{{vm.createNewAccount ? 'Login' : 'Register'}}\r" +
+    "\n" +
+    "		</button>\r" +
+    "\n" +
+    "    </ion-nav-buttons>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<ion-content class=\"padding\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "		<form 	novalidate\r" +
+    "\n" +
+    "			   	name=\"loginForm\"\r" +
+    "\n" +
+    "			   	ng-submit=\"vm.submit(vm.dataToSubmit)\">\r" +
+    "\n" +
+    "			<div class=\"list\">\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Username</span>\r" +
+    "\n" +
+    "					<input type=\"text\"\r" +
+    "\n" +
+    "						   placeholder=\"Username\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.username\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-floating-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Password</span>\r" +
+    "\n" +
+    "					<input type=\"password\"\r" +
+    "\n" +
+    "						   placeholder=\"Password\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.password\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label 	class=\"item item-input item-floating-label\"\r" +
+    "\n" +
+    "						ng-show=\"vm.createNewAccount\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Your Name</span>\r" +
+    "\n" +
+    "					<input type=\"text\"\r" +
+    "\n" +
+    "						   placeholder=\"Your Name\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.name\"\r" +
+    "\n" +
+    "						   ng-required=\"vm.createNewAccount\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label 	class=\"item item-input item-floating-label\"\r" +
+    "\n" +
+    "						ng-show=\"vm.createNewAccount\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Email (optional)</span>\r" +
+    "\n" +
+    "					<input type=\"email\"\r" +
+    "\n" +
+    "						   placeholder=\"Email (optional)\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.email\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			<button type=\"submit\"\r" +
+    "\n" +
+    "					class=\"button button-block button-positive\"\r" +
+    "\n" +
+    "					ng-disabled=\"loginForm.$invalid\">\r" +
+    "\n" +
+    "				{{vm.createNewAccount ? 'Register' : 'Login'}}\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</form>\r" +
+    "\n" +
+    "		\r" +
+    "\n" +
+    "		<div class=\"list\">\r" +
+    "\n" +
+    "			<label class=\"item assertive\" ng-show=\"vm.error\">\r" +
+    "\n" +
+    "				Wrong username or password\r" +
+    "\n" +
+    "			</label>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-view>"
   );
 
 
   $templateCache.put('views/tab-child.html',
-    "<ion-view view-title=\"Child\">\n" +
-    "	<ion-content>\n" +
-    "		<div class=\"bar bar-header\">\n" +
-    "			<h1 class=\"title\">TODO</h1>\n" +
-    "		</div>\n" +
-    "	</ion-content>\n" +
+    "<ion-view view-title=\"Child\">\r" +
+    "\n" +
+    "	<ion-content>\r" +
+    "\n" +
+    "		<div class=\"bar bar-header\">\r" +
+    "\n" +
+    "			<h1 class=\"title\">TODO</h1>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-view>"
   );
 
 
   $templateCache.put('views/tab-parent.html',
-    "<ion-view view-title=\"My Children\">\n" +
-    "	<ion-content class=\"padding\">\n" +
+    "<ion-view view-title=\"My Children\">\r" +
     "\n" +
-    "		<div class=\"list\">\n" +
-    "			<div ng-repeat=\"child in vm.children\">\n" +
-    "				<a class=\"item\" ui-sref=\"tab.parentsChild({childId: child._id})\">\n" +
-    "					{{child.name}}\n" +
-    "				</a>\n" +
-    "			</div>\n" +
-    "		</div>\n" +
+    "	<ion-content class=\"padding\">\r" +
     "\n" +
-    "		<button class=\"button button-icon icon ion-ios-plus-outline\"></button>\n" +
+    "\r" +
     "\n" +
-    "	</ion-content>\n" +
+    "		<div class=\"list\">\r" +
+    "\n" +
+    "			<div ng-repeat=\"child in vm.children\">\r" +
+    "\n" +
+    "				<a class=\"item\" ui-sref=\"tab.parentsChild({childId: child._id})\">\r" +
+    "\n" +
+    "					{{child.name}}\r" +
+    "\n" +
+    "				</a>\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "		</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "		<button class=\"button button-icon icon ion-ios-plus-outline\"></button>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-view>"
   );
 
 
   $templateCache.put('views/tabs.html',
-    "<!--\n" +
-    "Create tabs with an icon and label, using the tabs-positive style.\n" +
-    "Each tab's child <ion-nav-view> directive will have its own\n" +
-    "navigation history that also transitions its views in and out.\n" +
-    "-->\n" +
-    "<ion-tabs class=\"tabs-icon-top tabs-color-active-positive\">\n" +
+    "<!--\r" +
     "\n" +
-    "	<!-- Parent tab -->\n" +
-    "	<ion-tab title=\"Parent\" icon=\"ion-person\" ui-sref=\"tab.parent\">\n" +
-    "		<ion-nav-view name=\"parent-tab\"></ion-nav-view>\n" +
-    "	</ion-tab>\n" +
+    "Create tabs with an icon and label, using the tabs-positive style.\r" +
     "\n" +
-    "	<!-- Child tab -->\n" +
-    "	<ion-tab title=\"Child\" icon=\"ion-ios-body\" ui-sref=\"tab.child\">\n" +
-    "		<ion-nav-view name=\"child-tab\"></ion-nav-view>\n" +
-    "	</ion-tab>\n" +
+    "Each tab's child <ion-nav-view> directive will have its own\r" +
+    "\n" +
+    "navigation history that also transitions its views in and out.\r" +
+    "\n" +
+    "-->\r" +
+    "\n" +
+    "<ion-tabs class=\"tabs-icon-top tabs-color-active-positive\">\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<!-- Parent tab -->\r" +
+    "\n" +
+    "	<ion-tab title=\"Parent\" icon=\"ion-person\" ui-sref=\"tab.parent\">\r" +
+    "\n" +
+    "		<ion-nav-view name=\"parent-tab\"></ion-nav-view>\r" +
+    "\n" +
+    "	</ion-tab>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "	<!-- Child tab -->\r" +
+    "\n" +
+    "	<ion-tab title=\"Child\" icon=\"ion-ios-body\" ui-sref=\"tab.child\">\r" +
+    "\n" +
+    "		<ion-nav-view name=\"child-tab\"></ion-nav-view>\r" +
+    "\n" +
+    "	</ion-tab>\r" +
+    "\n" +
+    "\r" +
     "\n" +
     "</ion-tabs>"
   );
 
 
   $templateCache.put('views/withdrawOverlay.html',
-    "<ion-modal-view ng-controller=\"withdrawOverlayCtrl as vm\">\n" +
-    "	<ion-header-bar class=\"bar-stable\">\n" +
-    "		<h1 class=\"title\">Make a Withdraw</h1>\n" +
-    "		<button class=\"button button-clear button-positive\"\n" +
-    "				ng-click=\"dismissModal()\">Cancel</button>\n" +
-    "	</ion-header-bar>\n" +
-    "	<ion-content>\n" +
-    "		<form novalidate name=\"withdrawForm\"\n" +
-    "			  ng-submit=\"vm.submitWithdraw()\">\n" +
-    "			<div class=\"list\">\n" +
-    "				<label class=\"item item-input item-stacked-label\">\n" +
-    "					<span class=\"input-label\">Amount to Withdraw</span>\n" +
-    "					<input type=\"number\"\n" +
-    "						   min=\"1\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.sum\"\n" +
-    "						   ng-required=\"true\">\n" +
-    "				</label>\n" +
+    "<ion-modal-view ng-controller=\"withdrawOverlayCtrl as vm\">\r" +
     "\n" +
-    "				<label class=\"item item-input item-stacked-label\">\n" +
-    "					<span class=\"input-label\">Description</span>\n" +
-    "					<input type=\"text\"\n" +
-    "						   ng-model=\"vm.dataToSubmit.description\">\n" +
-    "				</label>\n" +
-    "			</div>\n" +
+    "	<ion-header-bar class=\"bar-stable\">\r" +
     "\n" +
-    "			<button class=\"button button-block button-assertive\"\n" +
-    "					ng-disabled=\"withdrawForm.$invalid\">\n" +
-    "				Withdraw\n" +
-    "			</button>\n" +
-    "		</form>\n" +
-    "	</ion-content>\n" +
+    "		<h1 class=\"title\">Make a Withdraw</h1>\r" +
+    "\n" +
+    "		<button class=\"button button-clear button-positive\"\r" +
+    "\n" +
+    "				ng-click=\"dismissModal()\">Cancel</button>\r" +
+    "\n" +
+    "	</ion-header-bar>\r" +
+    "\n" +
+    "	<ion-content>\r" +
+    "\n" +
+    "		<form novalidate name=\"withdrawForm\"\r" +
+    "\n" +
+    "			  ng-submit=\"vm.submitWithdraw()\">\r" +
+    "\n" +
+    "			<div class=\"list\">\r" +
+    "\n" +
+    "				<label class=\"item item-input item-stacked-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Amount to Withdraw</span>\r" +
+    "\n" +
+    "					<input type=\"number\"\r" +
+    "\n" +
+    "						   min=\"1\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.sum\"\r" +
+    "\n" +
+    "						   ng-required=\"true\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "				<label class=\"item item-input item-stacked-label\">\r" +
+    "\n" +
+    "					<span class=\"input-label\">Description</span>\r" +
+    "\n" +
+    "					<input type=\"text\"\r" +
+    "\n" +
+    "						   ng-model=\"vm.dataToSubmit.description\">\r" +
+    "\n" +
+    "				</label>\r" +
+    "\n" +
+    "			</div>\r" +
+    "\n" +
+    "\r" +
+    "\n" +
+    "			<button class=\"button button-block button-assertive\"\r" +
+    "\n" +
+    "					ng-disabled=\"withdrawForm.$invalid\">\r" +
+    "\n" +
+    "				Withdraw\r" +
+    "\n" +
+    "			</button>\r" +
+    "\n" +
+    "		</form>\r" +
+    "\n" +
+    "	</ion-content>\r" +
+    "\n" +
     "</ion-modal-view>"
   );
 

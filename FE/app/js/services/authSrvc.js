@@ -3,36 +3,44 @@
         .module('app')
         .service('authSrvc', authSrvc);
 
-    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', '$http', 'cacheMap', 'routeSrvc'];
-    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, $http, cacheMap, routeSrvc) {
+    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', 'locStoreMap', '$http', 'cacheMap', 'routeSrvc'];
+    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, locStoreMap, $http, cacheMap, routeSrvc) {
+        
+        this.setLoggedInState = setLoggedInState;
+        this.isAuthenticated = isAuthenticated;
+        this.redirectToLoginIfNotAuth = redirectToLoginIfNotAuth;
+        this.redirectToHomeIfAuth = redirectToHomeIfAuth;
+        this.setLoggedOutState = setLoggedOutState;
+
         var that = this;
+        ///////////////////////
 
         /**
          * Check the login-cache if the user is already logged-in.
          * See app.js: 'reEnterLoginSession' for details
          */
-        this.isAuthenticated = function () {
+        function isAuthenticated() {
             var loginCache = $cacheFactory.get(cacheMap.login.id);
             if (loginCache && loginCache.get(cacheMap.login.keys.loggedIn) === true) {
                 return true;
             } else {
                 return false;
             }
-        };
+        }
 
         /**
          * Go to login view if parent is not logged in
          */
-        this.redirectToLoginIfNotAuth = function () {
+        function redirectToLoginIfNotAuth() {
             if (!that.isAuthenticated()) { routeSrvc.gotoLogin(); }
-        };
+        }
 
         /**
          * Go to home view if parent is already logged in
          */
-        this.redirectToHomeIfAuth = function () {
+        function redirectToHomeIfAuth() {
             if (that.isAuthenticated()) { routeSrvc.gotoHome(); }
-        };
+        }
 
         /**
          * Set the user-state as logged-in:
@@ -40,10 +48,10 @@
          * 2) set the loggedIn state as 'true' in the cache
          * 3) set the user token as a header for all future HTTP requests
          */
-        this.setLoggedInState = function (credentials) {
+        function setLoggedInState(credentials) {
 
             // 1)
-            locStoreSrvc.storeObject('credentials', {
+            locStoreSrvc.storeObject(locStoreMap.credentials, {
                 username: credentials.username,
                 token: credentials.token
             });
@@ -54,7 +62,7 @@
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = credentials.token;
-        };
+        }
 
         /**
          * Set the user-state as logged-out:
@@ -63,11 +71,11 @@
          * 2) set the loggedIn state as 'false' in the cache
          * 3) remove the user-token-header for all future HTTP requests
          */
-        this.setLoggedOutState = function () {
+        function setLoggedOutState() {
 
             // 1); 1.1)
-            locStoreSrvc.remove('credentials');
-            locStoreSrvc.remove('parentName');
+            locStoreSrvc.remove(locStoreMap.credentials);
+            locStoreSrvc.remove(locStoreMap.parentName);
 
             // 2)
             var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
@@ -75,6 +83,6 @@
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = undefined;
-        };
+        }
     }
 })(angular);

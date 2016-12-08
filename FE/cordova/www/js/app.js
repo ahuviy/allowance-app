@@ -11,9 +11,9 @@
 	 * as a header for all http requests and cache a global: 'loggedIn' to true
 	 * in a 'login' cache.
 	 */
-	reEnterLoginSession.$inject = ['$http', 'locStoreSrvc', '$cacheFactory', 'cacheMap'];
-	function reEnterLoginSession($http, locStoreSrvc, $cacheFactory, cacheMap) {
-		var credentials = locStoreSrvc.getObject('credentials');
+	reEnterLoginSession.$inject = ['$http', 'locStoreSrvc', '$cacheFactory', 'cacheMap', 'locStoreMap'];
+	function reEnterLoginSession($http, locStoreSrvc, $cacheFactory, cacheMap, locStoreMap) {
+		var credentials = locStoreSrvc.getObject(locStoreMap.credentials);
 		var loginCache = $cacheFactory(cacheMap.login.id);
 
 		if (credentials && credentials.username && credentials.token) {

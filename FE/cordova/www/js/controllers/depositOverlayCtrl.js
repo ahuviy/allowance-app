@@ -3,9 +3,9 @@
         .module('app')
         .controller('depositOverlayCtrl', depositOverlayCtrl);
 
-    depositOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc', 'ionErrorHandlerSrvc'];
+    depositOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc', 'ionErrorHandlerSrvc', 'locStoreMap'];
 
-    function depositOverlayCtrl(depositOverlayCtrl, locStoreSrvc, authSrvc, ionErrorHandlerSrvc) {
+    function depositOverlayCtrl(depositOverlayCtrl, locStoreSrvc, authSrvc, ionErrorHandlerSrvc, locStoreMap) {
         var credentials;
         var $scope = this;
 
@@ -15,7 +15,7 @@
             // skip to login if parent is not authenticated
             authSrvc.redirectToLoginIfNotAuth();
 
-            credentials = locStoreSrvc.getObject('credentials');
+            credentials = locStoreSrvc.getObject(locStoreMap.credentials);
 
             // vars for the <select> html element
             $scope.selectDepositType = [

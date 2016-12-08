@@ -3,8 +3,8 @@
         .module('app')
         .service('authSrvc', authSrvc);
 
-    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', '$http', 'cacheMap', 'routeSrvc'];
-    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, $http, cacheMap, routeSrvc) {
+    authSrvc.$inject = ['$cacheFactory', '$ionicHistory', '$state', 'locStoreSrvc', 'locStoreMap', '$http', 'cacheMap', 'routeSrvc'];
+    function authSrvc($cacheFactory, $ionicHistory, $state, locStoreSrvc, locStoreMap, $http, cacheMap, routeSrvc) {
         var that = this;
 
         /**
@@ -43,7 +43,7 @@
         this.setLoggedInState = function (credentials) {
 
             // 1)
-            locStoreSrvc.storeObject('credentials', {
+            locStoreSrvc.storeObject(locStoreMap.credentials, {
                 username: credentials.username,
                 token: credentials.token
             });
@@ -66,12 +66,12 @@
         this.setLoggedOutState = function () {
 
             // 1); 1.1)
-            locStoreSrvc.remove('credentials');
-            locStoreSrvc.remove('parentName');
+            locStoreSrvc.remove(locStoreMap.credentials);
+            locStoreSrvc.remove(locStoreMap.parentName);
 
             // 2)
             var loginCache = $cacheFactory.get(cacheMap.login.id) || $cacheFactory(cacheMap.login.id);
-            loginCache.put(cacheMap.login.loggedIn, false);
+            loginCache.put(cacheMap.login.keys.loggedIn, false);
 
             // 3)
             $http.defaults.headers.common['x-access-token'] = undefined;

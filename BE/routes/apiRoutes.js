@@ -259,8 +259,9 @@ router.get('/api/account/:childId/delete', Verify.verifyParent, (req, res) => {
         parentPromise,
         (child, parent) => {
             // remove childId from parent childId array
-            parent.childrenIds = parent.childrenIds.filter(id => id.toString() !== child._id.toString());
+            parent.childrenIds = parent.childrenIds.filter(id => id && id.toString() !== child._id.toString());
             parent.save();
+            
             // recycle the account-no
             uniqueModel.create({ number: child.username });
         })

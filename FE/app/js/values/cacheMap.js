@@ -17,6 +17,14 @@
                 keys: {
                     loggedIn: 'loggedIn' // {Boolean}
                 }
+            },
+            apiGet: {
+                id: 'apiGet',
+                keys: {}
+            },
+            apiPost: {
+                id: 'apiPost',
+                keys: {}
             }
 		};
 	}

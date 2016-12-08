@@ -1,6 +1,3 @@
-/*
- * The data-service handles all HTTP requests
- */
 (function (angular) {
 	angular
 		.module('app')
@@ -11,24 +8,22 @@
 	function dataSrvc($rootScope, apiMap, mockupSrvc, _, $http, $q, ionErrorHandlerSrvc) {
 		this.api = api;
 
-		/*
-		 * api
-		 * This function gets a URL from 'apiMap' (in /js/values). Then, it attempts
+		/////////////////////
+
+		/**
+		 * Gets a URL from 'apiMap' (in /js/values). Then, it attempts
 		 * to simulate the server response using the 'mockupSrvc'. If it can't
 		 * simulate the response, it sends a real HTTP request to the server.
-		 *
-		 * @params:
-		 * cfg {
-		 * 		type (string): describes the api action to be taken (see apiMap.js)
-		 *		args (obj): the args to pass in POST requests
-		 *		urlObj (obj): parameters to compile the urlTemplate into a url
-		 *		specialErrorHandlerData (string)
-		 *		disableAutoErrorHandler (bool)
-		 *		disableBI (bool): disable the busy-indicator (see busyIndicatorDrtv.js)
-		 * }
+		 * @param {Object} cfg Contains the options for the API request:
+		 * type {String} Describes the api action to be taken (see apiMap.js).
+		 * args {Object} The args to pass in POST requests.
+		 * urlObj {Object} Parameters to compile the urlTemplate into a url.
+		 * disableBI {Boolean} Disable the busy-indicator (see busyIndicatorDrtv.js).
+		 * disableAutoErrorHandler {Boolean} Disables the error-handler.
+		 * specialErrorHandlerData {String} Special text that replaces the default error text.
+		 * @returns {Promise}
 		 */
 		function api(cfg) {
-			// Signal the 'busy-indicator' event, unless cfg.disableBI = true
 			if (!cfg.disableBI) {
 				$rootScope.$broadcast('startBI');
 			}
@@ -38,15 +33,10 @@
 			var method = reqObj.method;
 			var args = cfg.args;
 
-			/*
-			 * Get the appropriate mock response from the 'mockupSrvc'
-			 */
+			// Get the appropriate mock response from the 'mockupSrvc'
 			var responsePromise = mockupSrvc.mockup(url, method, args);
 
-			/*
-			 * If there is no appropriate mock response (mockupSrvc returns null),
-			 * make a real HTTP request.
-			 */
+			// If there is no appropriate mock response make a real HTTP request.
 			if (responsePromise === null) {
 				if (method === 'POST') {
 					responsePromise = $http.post(url, reqObj.noPayload ? null : cfg.args);
@@ -54,45 +44,34 @@
 					responsePromise = $http.get(url);
 				}
 			}
-
 			return wrapForErrorHandler(responsePromise, cfg);
-		}
 
-		function wrapForErrorHandler(promise, cfg) {
-			var defer = $q.defer();
-			promise.then(success, hasError);
-			return defer.promise;
-
-			/*
-			 * If the HTTP request was successful (and response status is not 500),
-			 * broadcast the event that was defined in 'apiMap' and another event
-			 * to stop the busy-indicator.
-			 */
-			function success(response) {
-				if (response.status !== 500) {
-					$rootScope.$broadcast(apiMap[cfg.type].event);
-					if (!cfg.disableBI) {
-						$rootScope.$broadcast('stopBI');
-					}
-					defer.resolve(response);
-				} else {
-					hasError(response);
-				}
-			}
-
-			/*
-			 * If the HTTP request was unsuccessful, broadcast the event to stop
-			 * the busy-indicator and console.log an error.
-			 */
-			function hasError(response) {
-				if (!cfg.disableBI) {
-					$rootScope.$broadcast('stopBI');
-				}
-				if (!cfg.disableAutoErrorHandler) {
-					ionErrorHandlerSrvc.show(cfg.specialErrorHandlerData || response.data);
-				}
-				return defer.reject(response);
+			function wrapForErrorHandler(promise, cfg) {
+				var defer = $q.defer();
+				promise
+					.then(function (response) {
+						if (response.status !== 500) {
+							$rootScope.$broadcast(apiMap[cfg.type].event);
+							if (!cfg.disableBI) {
+								$rootScope.$broadcast('stopBI');
+							}
+							defer.resolve(response);
+						} else {
+							defer.reject(response);
+						}
+					})
+					.catch(function (response) {
+						if (!cfg.disableBI) {
+							$rootScope.$broadcast('stopBI');
+						}
+						if (!cfg.disableAutoErrorHandler) {
+							ionErrorHandlerSrvc.show(cfg.specialErrorHandlerData || response.data);
+						}
+						return defer.reject(response);
+					});
+				
+				return defer.promise;
 			}
 		}
 	}
-}(angular));
+} (angular));

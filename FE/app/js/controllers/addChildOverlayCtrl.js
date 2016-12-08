@@ -52,8 +52,8 @@
                 // BE: recycle the generated account number
                 var apiCfg = {
                     type: 'cancelNewAccountNumber',
-                    urlObj: { accountNo: $scope.dataToSubmit.accountNo },
-                    args: { accountNo: $scope.dataToSubmit.accountNo }
+                    urlParams: { accountNo: $scope.dataToSubmit.accountNo },
+                    data: { accountNo: $scope.dataToSubmit.accountNo }
                 };
                 dataSrvc.api(apiCfg).then(function(res) { console.log(res, 'res'); });
             }
@@ -74,7 +74,7 @@
         function sendDeleteReq() {
             var apiCfg = {
                 type: 'deleteChild',
-                urlObj: { childId: addChildOverlayCtrl.child.userId }
+                urlParams: { childId: addChildOverlayCtrl.child.userId }
             };
             dataSrvc.api(apiCfg).then(function(res) {
                 console.log(res, 'deleteChild-res');

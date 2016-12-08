@@ -19,7 +19,7 @@
 			// get child data (account, user, transactions)
 			var apiCfg = {
 				type: 'getChildById',
-				urlObj: { childId: $stateParams.childId }
+				urlParams: { childId: $stateParams.childId }
 			};
 			dataSrvc.api(apiCfg).then(function (res) {
 				console.log(res.data, 'res');
@@ -71,8 +71,8 @@
 			console.log(child, "updateChild-req");
 			var apiCfg = {
 				type: 'updateChild',
-				args: child,
-				urlObj: { childId: $stateParams.childId }
+				data: child,
+				urlParams: { childId: $stateParams.childId }
 			};
 			dataSrvc.api(apiCfg).then(function (res) {
 				// response should contain a success message
@@ -86,8 +86,8 @@
 			// BE: deposit to the child account
 			var apiCfg = {
 				type: 'deposit',
-				args: depositObj,
-				urlObj: { accountId: $stateParams.childId }
+				data: depositObj,
+				urlParams: { accountId: $stateParams.childId }
 			};
 			dataSrvc.api(apiCfg).then(function (res) {
 				console.log(res, "deposit-res");
@@ -103,8 +103,8 @@
 			// BE: withdraw from the child account
 			var apiCfg = {
 				type: 'withdraw',
-				args: withdrawObj,
-				urlObj: { accountId: $stateParams.childId }
+				data: withdrawObj,
+				urlParams: { accountId: $stateParams.childId }
 			};
 			dataSrvc.api(apiCfg).then(function (res) {
 				console.log(res, "withdraw-res");

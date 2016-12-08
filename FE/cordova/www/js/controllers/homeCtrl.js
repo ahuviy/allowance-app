@@ -3,8 +3,8 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
-    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
+    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
+    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
         var credentials;
 		var $scope = this;
 
@@ -15,8 +15,8 @@
             authSrvc.redirectToLoginIfNotAuth();
 
             // retrieve the parent-credentials and parentName from local-storage
-            credentials = locStoreSrvc.getObject('credentials');
-            $scope.parentName = locStoreSrvc.get('parentName');
+            credentials = locStoreSrvc.getObject(locStoreMap.credentials);
+            $scope.parentName = locStoreSrvc.get(locStoreMap.parentName);
 
             // BE: get all the children of this parent
 			var apiCfg = {
@@ -29,7 +29,7 @@
 				$scope.parentName = res.data.parentName;
 				
 				// store parent-name in local-storage
-				locStoreSrvc.store('parentName', res.data.parentName);
+				locStoreSrvc.store(locStoreMap.parentName, res.data.parentName);
 			});
         }
 

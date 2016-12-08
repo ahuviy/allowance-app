@@ -33,7 +33,7 @@
             console.log(loginData, 'login-req');
             var apiCfg = {
                 type: 'loginWithUsername',
-                args: loginData,
+                data: loginData,
                 disableAutoErrorHandler: true
             };
             dataSrvc.api(apiCfg).then(
@@ -60,7 +60,7 @@
             console.log(registerData, 'register-req');
             var apiCfg = {
                 type: 'addParent',
-                args: registerData,
+                data: registerData,
                 disableAutoErrorHandler: true
             };
             dataSrvc.api(apiCfg).then(function (res) {
