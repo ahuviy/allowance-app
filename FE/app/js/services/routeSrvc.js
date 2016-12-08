@@ -4,22 +4,34 @@
         .service('routeSrvc', routeSrvc);
 
     routeSrvc.$inject = ['$ionicHistory', '$state'];
+    
     function routeSrvc($ionicHistory, $state) {
+        // functions to export
+        this.go = go;
+        this.reload = reload;
+
+        ////////////////////
+        
         /**
-         * Go to home view, disabling the back-button
+         * Go to new state.
+         * @param {String} state new state to go to.
+         * @param {Boolean} disableBack disable the back button on next state. Default is false.
          */
-        this.gotoHome = function () {
-            $ionicHistory.nextViewOptions({ disableBack: true });
-            $state.go('home');
-        };
+        function go(state, disableBack) {
+            if (disableBack === undefined) {
+                disableBack = false;
+            }
+            if (disableBack) {
+                $ionicHistory.nextViewOptions({ disableBack: true });
+            }
+            $state.go(state);
+        }
 
         /**
-         * Go to login view, disabling the back-button
+         * Reload current state
          */
-        this.gotoLogin = function () {
-            $ionicHistory.nextViewOptions({ disableBack: true });
-            $state.go('login');
-        };
-
+        function reload() {
+            $state.go($state.current, {}, { reload: true });
+        }
     }
 })(angular);

@@ -3,9 +3,9 @@
 		.module('app')
 		.service('ionErrorHandlerSrvc', ionErrorHandlerSrvc);
 
-	ionErrorHandlerSrvc.$inject = ['$q', 'ionOverlaySrvc', '$ionicPopup', '$state'];
+	ionErrorHandlerSrvc.$inject = ['$q', 'ionOverlaySrvc', '$ionicPopup', 'routeSrvc'];
 
-	function ionErrorHandlerSrvc($q, ionOverlaySrvc, $ionicPopup, $state) {
+	function ionErrorHandlerSrvc($q, ionOverlaySrvc, $ionicPopup, routeSrvc) {
 
 		// An error modal
 		this.show = function (errorData) {
@@ -20,7 +20,7 @@
 			$ionicPopup.alert({ title: title, template: template })
 				.then(function () {
 					// reload current page
-					$state.go($state.current, {}, { reload: true });
+					routeSrvc.reload();
 				});
 		};
 

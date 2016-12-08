@@ -31,12 +31,11 @@
             // BE: submit the login data to server
             // server expects json: {username: string, password: string} 
             console.log(loginData, 'login-req');
-            var apiCfg = {
+            dataSrvc.api({
                 type: 'loginWithUsername',
                 data: loginData,
                 disableAutoErrorHandler: true
-            };
-            dataSrvc.api(apiCfg).then(
+            }).then(
                 function successCb(res) {
                     console.log(res.data, 'login-res');
 
@@ -46,8 +45,8 @@
                         token: res.data.token
                     });
 
-                    // skip to home
-                    routeSrvc.gotoHome();
+                    // skip to home and disable back-button
+                    routeSrvc.go('home', true);
 
                 },
                 function failureCb(err) {
@@ -58,12 +57,11 @@
 
         function submitRegister(registerData) {
             console.log(registerData, 'register-req');
-            var apiCfg = {
+            dataSrvc.api({
                 type: 'addParent',
                 data: registerData,
                 disableAutoErrorHandler: true
-            };
-            dataSrvc.api(apiCfg).then(function (res) {
+            }).then(function (res) {
                 console.log(res.data, 'register-res');
 
                 // Popup an alert dialog

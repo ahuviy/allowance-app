@@ -36,7 +36,7 @@
         $scope.logout = function() {
             ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
                 authSrvc.setLoggedOutState();
-                routeSrvc.gotoLogin();
+                routeSrvc.go('login', true);
             });
         };
 

@@ -1,11 +1,11 @@
-(function(angular) {
+(function (angular) {
     angular
         .module('app')
         .service('locStoreSrvc', locStoreSrvc);
 
     locStoreSrvc.$inject = ['$window'];
     function locStoreSrvc($window) {
-        
+
         this.store = store;
         this.get = get;
         this.storeObject = storeObject;
@@ -50,8 +50,9 @@
             if ($window.localStorage[key]) {
                 $window.localStorage.removeItem(key);
                 return true;
+            } else {
+                return false;
             }
-            return false;
         }
 
         /**

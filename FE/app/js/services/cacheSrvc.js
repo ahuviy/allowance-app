@@ -4,7 +4,9 @@
         .service('cacheSrvc', cacheSrvc);
 
     cacheSrvc.$inject = ['$cacheFactory', '$q'];
+    
     function cacheSrvc($cacheFactory, $q) {
+        // functions to export
         this.get = get;
         this.getAsync = getAsync;
         this.store = store;
