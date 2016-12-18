@@ -101,8 +101,7 @@
 			if (mockupMap[url] &&
 				mockupMap[url].method === method &&
 				angular.equals(mockupMap[url].data, data)) {
-
-				$q.resolve(mockupMap[url].mockup);
+				return $q.resolve(mockupMap[url].mockup);
 			} else {
 				return undefined;
 			}
@@ -190,12 +189,12 @@
 			if (angular.isFunction(condition)) {
 				retval = condition();
 				if (typeof retval !== 'boolean') {
-					throw new Error('Error in enableMockup: condition evaluates to a non-boolean.');
+					throw new Error('condition evaluates to a non-boolean.');
 				}
 			} else if (typeof condition === 'boolean') {
 				retval = condition;
 			} else {
-				throw new Error('Error in enableMockup: condition is of wrong type.');
+				throw new Error('condition is of wrong type.');
 			}
 			_mockupEnabled = retval;
 		}
