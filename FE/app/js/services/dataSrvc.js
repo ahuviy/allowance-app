@@ -16,7 +16,7 @@
 		var _mockupEnabled = true;
 
 		/**
-		 * 1) Attempts to mock a server response via mockupMap.
+		 * 1) Attempts to mock a server response.
 		 * 2) Attempts to use a previously-cached-response.
 		 * 3) Sends a real HTTP request to the server.
 		 * Note: only supports GET/POST requests.
@@ -33,76 +33,39 @@
 		 * @returns {Promise}
 		 */
 		function api(cfg) {
+			applyCfgDefaults(cfg);
+			signalToStartBusyIndicator(cfg);
+			
+			var url = getUrlFromCfg(cfg);
+			var method = getMethodFromCfg(cfg);
+			var data = getDataFromCfg(cfg);
+			var responsePromise;
+
+			if (_mockupEnabled) {
+				responsePromise = attemptMockResponse(url, method, data);
+			}
+			if (!responsePromise && cfg.useCachedRes) {
+				responsePromise = attemptCachedResponse(method, url);
+			}
+			if (!responsePromise) {
+				responsePromise = makeHttpRequest(method, url, data, cfg.reqConfig);
+			}
+			return responsePromise.then(
+				function (response) {
+					return finalizeApiCall(response, cfg);
+				},
+				function (response) {
+					return handleResponseErrors(response, cfg);
+				}
+			);
+		}
+
+		function applyCfgDefaults(cfg) {
 			if (cfg.useCachedRes === undefined) {
 				cfg.useCachedRes = false;
 			}
 			if (cfg.saveResToCache === undefined) {
 				cfg.saveResToCache = false;
-			}
-			if (!cfg.disableBI) {
-				$rootScope.$broadcast('startBI');
-			}
-			var reqObj = apiMap[cfg.type];
-			var url = reqObj.url || compileUrl(reqObj.urlTemplate, cfg.urlParams);
-			var method = reqObj.method;
-			var data = reqObj.noPayload ? null : cfg.data;
-			var responsePromise;
-			
-			// attempt to get a mock response
-			if (_mockupEnabled) {
-				responsePromise = mockup(url, method, data);
-				if (responsePromise) {
-					return wrapForErrorHandler(responsePromise);
-				}
-			}
-
-			// attempt to retrieve a previously-cached-response
-			if (cfg.useCachedRes) {
-				var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-				var cachedResponse = cacheSrvc.get(cacheId, url);
-				if (cachedResponse) {
-					responsePromise = asyncWrapper(cachedResponse);
-					return wrapForErrorHandler(responsePromise);
-				}
-			}
-
-			// make an HTTP request
-			if (method === 'POST') {
-				responsePromise = $http.post(url, data, cfg.reqConfig);
-			} else if (method === 'GET') {
-				responsePromise = $http.get(url, cfg.reqConfig);
-			} else {
-				throw new Error('API requests can only be GET or POST.');
-			}
-			return wrapForErrorHandler(responsePromise);
-
-			function wrapForErrorHandler(responsePromise) {
-				var defer = $q.defer();
-				responsePromise
-					.then(function (response) {
-						$rootScope.$broadcast(reqObj.event);
-
-						// save response to cache
-						if (cfg.saveResToCache) {
-							var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-							cacheSrvc.store(cacheId, url, response);
-						}
-
-						if (!cfg.disableBI) {
-							$rootScope.$broadcast('stopBI');
-						}
-						defer.resolve(response);
-					})
-					.catch(function (response) {
-						if (!cfg.disableBI) {
-							$rootScope.$broadcast('stopBI');
-						}
-						if (!cfg.disableAutoErrorHandler) {
-							ionErrorHandlerSrvc.show(cfg.specialErrorHandlerData || response.data);
-						}
-						return defer.reject(response);
-					});
-				return defer.promise;
 			}
 		}
 
@@ -127,17 +90,6 @@
 		}
 
 		/**
-		 * A wrapper that converts data into a promise.
-		 * @param {Any} data
-		 * @returns {Promise}
-		 */
-		function asyncWrapper(data) {
-			var defer = $q.defer();
-			defer.resolve(data);
-			return defer.promise;
-		}
-
-		/**
 		 * Check the mockupMap if there is a mocked response
 		 * available for the specified request.
 		 * @param {String} url the request-URL.
@@ -145,21 +97,93 @@
 		 * @param {Object} data the data to pass in POST requests.
 		 * @returns {Promise|null} a mocked-response-promise, or null if not found. 
 		 */
-		function mockup(url, method, data) {
-			var defer = $q.defer();
+		function attemptMockResponse(url, method, data) {
 			if (mockupMap[url] &&
 				mockupMap[url].method === method &&
 				angular.equals(mockupMap[url].data, data)) {
-				defer.resolve(mockupMap[url].mockup);
+
+				$q.resolve(mockupMap[url].mockup);
 			} else {
-				return null;
+				return undefined;
 			}
-			return defer.promise;
+		}
+
+		function attemptCachedResponse(method, url) {
+			var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
+			var cachedResponse = cacheSrvc.get(cacheId, url);
+			return cachedResponse ? $q.resolve(cachedResponse) : undefined;
+		}
+
+		function makeHttpRequest(method, url, data, config) {
+			if (method === 'POST') {
+				return $http.post(url, data, config);
+			} else if (method === 'GET') {
+				return $http.get(url, config);
+			} else {
+				throw new Error('API requests can only be GET or POST.');
+			}
+		}
+
+		function finalizeApiCall(response, cfg) {
+			var apiSuccessEvent = apiMap[cfg.type].event;
+			if (apiSuccessEvent) {
+				$rootScope.$broadcast(apiSuccessEvent);
+			}
+			if (cfg.saveResToCache) {
+				saveResponseToCache(response, cfg);
+			}
+			signalToStopBusyIndicator(cfg);
+			return $q.resolve(response);
+		}
+
+		function handleResponseErrors(response, cfg) {
+			signalToStopBusyIndicator(cfg);
+			showErrorMessage(response, cfg);
+			return $q.reject(response);
+		}
+
+		function saveResponseToCache(response, cfg) {
+			var url = getUrlFromCfg(cfg);
+			var method = getMethodFromCfg(cfg);
+			var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
+			cacheSrvc.store(cacheId, url, response);
+		}
+
+		function getUrlFromCfg(cfg) {
+			var requestSettings = apiMap[cfg.type];
+			return requestSettings.url ||
+				compileUrl(requestSettings.urlTemplate, cfg.urlParams);
+		}
+
+		function getMethodFromCfg(cfg) {
+			return apiMap[cfg.type].method;
+		}
+
+		function getDataFromCfg(cfg) {
+			var requestSettings = apiMap[cfg.type];
+			return requestSettings.noPayload ? null : cfg.data;
+		}
+
+		function signalToStartBusyIndicator(cfg) {
+			if (!cfg.disableBI) {
+				$rootScope.$broadcast('startBI');
+			}
+		}
+		function signalToStopBusyIndicator(cfg) {
+			if (!cfg.disableBI) {
+				$rootScope.$broadcast('stopBI');
+			}
+		}
+
+		function showErrorMessage(response, cfg) {
+			if (!cfg.disableAutoErrorHandler) {
+				ionErrorHandlerSrvc.show(cfg.specialErrorHandlerData || response.data);
+			}
 		}
 
 		/**
 		 * Set the default API behavior whether to check for mocked responses.
-		 * @param {Function|Boolean} condition a function that returns a boolean or a boolean.
+		 * @param {Function|Boolean} condition a boolean or a function that returns a boolean.
 		 */
 		function enableMockup(condition) {
 			var retval;
