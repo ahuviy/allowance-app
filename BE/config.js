@@ -4,4 +4,4 @@ module.exports = {
     
     // secret-key for encryption of the jwt used for login
     'secretKey': '12345-ahuvi-09876-54321'
-}
+};

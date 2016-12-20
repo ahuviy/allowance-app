@@ -4,18 +4,18 @@
  * and 'passport-local-mongoose' modules
  *****************************************************************************/
 
-/**
- * Grab modules
- */
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var usersModel = require('./models/users');
 
-//----------------------------------------------------------------------------
-
-/**
- * Export the strategy for local authentication
- */
+// Here, we are using a function provided by passport-local-mongoose
+// to set-up the passport local-strategy.
 exports.local = passport.use(new LocalStrategy(usersModel.authenticate()));
+
+// Set-up the passport functions that enter a user into a session.
+// Here, we are using functions provided by passport-local-mongoose.
 passport.serializeUser(usersModel.serializeUser());
 passport.deserializeUser(usersModel.deserializeUser());
+
+
+// TODOahuvi: configure loginWithFacebook

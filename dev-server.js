@@ -22,8 +22,8 @@ var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');     // enables advanced mongoose promises
 mongoose.connect(config.mongoUrl);
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => console.log('Connected correctly to MongoDB server'));
+db.on('error', console.error.bind(console, 'Connection error:'));
+db.once('open', console.log.bind(console, 'Connected correctly to MongoDB server'));
 
 //-----------------------------------------------------------------------------
 
