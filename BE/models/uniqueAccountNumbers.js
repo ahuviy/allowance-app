@@ -16,6 +16,6 @@ var uniqueSchema = new Schema({
 });
 
 // Create a model for uniqueAccountNumbers
-var uniqueModel = mongoose.model('uniqueAccountNumbers', uniqueSchema);
+var UniqueModel = mongoose.model('unique-account-numbers', uniqueSchema);
 
-module.exports = uniqueModel;
+module.exports = UniqueModel;

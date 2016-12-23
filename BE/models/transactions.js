@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 
 // Create a schema for transactions
 var Schema = mongoose.Schema;
-var transactionsSchema = new Schema({
+var transactionSchema = new Schema({
 	userId: {
 		type: String,
 		required: true
@@ -36,6 +36,6 @@ var transactionsSchema = new Schema({
 });
 
 // create a model for transactions
-var transactionsModel = mongoose.model('Transactions', transactionsSchema);
+var TransactionModel = mongoose.model('transactions', transactionSchema);
 
-module.exports = transactionsModel;
+module.exports = TransactionModel;

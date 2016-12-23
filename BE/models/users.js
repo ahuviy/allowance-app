@@ -17,7 +17,7 @@ var passportLocalMongoose = require('passport-local-mongoose');
 
 var Schema = mongoose.Schema;
 
-var usersSchema = new Schema({
+var userSchema = new Schema({
 	username: {
 		type: String,
 		required: true,
@@ -42,7 +42,7 @@ var usersSchema = new Schema({
 
 // pluging-in passport-local-mongoose will put some methods
 // on the model (authenticate, serializeUser, deserializeUser, ...).
-usersSchema.plugin(passportLocalMongoose);
+userSchema.plugin(passportLocalMongoose);
 
-var usersModel = mongoose.model('Users', usersSchema);
-module.exports = usersModel;
+var UserModel = mongoose.model('users', userSchema);
+module.exports = UserModel;

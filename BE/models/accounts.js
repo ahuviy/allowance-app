@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 
 // Create a schema for accounts
 var Schema = mongoose.Schema;
-var accountsSchema = new Schema({
+var accountSchema = new Schema({
 	userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -50,6 +50,6 @@ var accountsSchema = new Schema({
 });
 
 // Create a model for accounts
-var accountsModel = mongoose.model('Accounts', accountsSchema);
+var AccountModel = mongoose.model('accounts', accountSchema);
 
-module.exports = accountsModel;
+module.exports = AccountModel;
