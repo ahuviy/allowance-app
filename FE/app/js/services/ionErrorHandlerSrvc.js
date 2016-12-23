@@ -26,14 +26,16 @@
 
 		// A confirm dialog popup
 		this.confirmPopup = function (title, template, successCb, failureCb) {
-			$ionicPopup.confirm({ title: title, template: template })
-				.then(function (res) {
-					if (res) {
-						if (successCb) { successCb(); }
-					} else {
-						if (failureCb) { failureCb(); }
-					}
-				});
+			$ionicPopup.confirm({
+				title: title,
+				template: template
+			}).then(function (res) {
+				if (res) {
+					if (angular.isFunction(successCb)) { successCb(); }
+				} else {
+					if (angular.isFunction(failureCb)) { failureCb(); }
+				}
+			});
 		};
 	}
 })(angular);
