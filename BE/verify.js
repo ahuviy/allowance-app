@@ -3,36 +3,37 @@
  * and helps to validate users using JSON web tokens.
  *****************************************************************************/
 
-var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+var jwt = require('jsonwebtoken');
 var config = require('./config');
 
-// Sign a new token for a supplied user. Returns the signed token.
-exports.getToken = (user) => {
-    return jwt.sign(user, config.secretKey, {
-        expiresIn: '365d'
-    });
+// exported functions
+module.exports = {
+    createToken: createToken,
+    loggedIn: loggedIn
 };
 
-// Verify that the parent is logged-in and in the 'Users' database.
-// Inserts the decoded token in the request object (request.decoded).
-exports.verifyParent = (req, res, next) => {
-    var token = req.body.token ||
-        req.query.token ||
-        req.headers['x-access-token'];
+function createToken(user) {
+    return jwt.sign(user, config.secretKey, { expiresIn: '365d' });
+}
 
-    if (token) {
+function loggedIn(req, res, next) {
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    try {
+        if (!token) { throw new VerifyException('No token provided', 403); }
+        
         jwt.verify(token, config.secretKey, (err, decoded) => {
-            if (err) {
-                err = new Error('You are not authenticated!');
-                err.status = 401;
-                next(err);
-            }
-            req.decoded = decoded;
+            if (err) { throw new VerifyException('You are not authenticated', 401); }
+            req.decoded = decoded;      // decoded token will now be available on the req object
             next();
         });
-    } else {
-        var err = new Error('No token provided!');
-        err.status = 403;
-        next(err);
     }
-};
+    catch (err) { next(err); }
+}
+
+function VerifyException(message, status) {
+    this.type = 'VerifyException';
+    this.message = message || '';
+    this.status = status || 500;
+}
+VerifyException.prototype = new Error();
