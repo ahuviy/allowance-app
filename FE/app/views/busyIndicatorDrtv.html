@@ -1,6 +1,5 @@
-<div ng-hide="show === 0" class="busy-indicator">
-	<div class="centered-screen">
+<div
+	ng-show="vm.show"
+	class="busy-indicator-wrapper">
 	<ion-spinner></ion-spinner>
-	</div>
-	<div ng-show="progress" class="progress-number" ng-bind="progress + '%' "></div>
 </div>

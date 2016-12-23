@@ -79,11 +79,10 @@ angular.module('app').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/busyIndicatorDrtv.html',
-    "<div ng-hide=\"show === 0\" class=\"busy-indicator\">\n" +
-    "	<div class=\"centered-screen\">\n" +
+    "<div\n" +
+    "	ng-show=\"vm.show\"\n" +
+    "	class=\"busy-indicator-wrapper\">\n" +
     "	<ion-spinner></ion-spinner>\n" +
-    "	</div>\n" +
-    "	<div ng-show=\"progress\" class=\"progress-number\" ng-bind=\"progress + '%' \"></div>\n" +
     "</div>"
   );
 

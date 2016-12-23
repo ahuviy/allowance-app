@@ -1,34 +1,56 @@
 (function (angular) {
-	var drtv = ['$rootScope',
-        function($rootScope){
-            return {
-            	restrict: 'E',
-                templateUrl: 'views/busyIndicatorDrtv.html',
-            	replace: true,
-                scope: true,
-                controller: function($scope, $rootScope){
-                    $scope.show = 0;
+    angular
+        .module('app')
+        .directive('busyIndicator', busyIndicator);
 
-                    $rootScope.$on('startBI', function(){
-                        $scope.show++;
-                    });
+    function busyIndicator() {
+        return {
+            restrict: 'E',
+            templateUrl: 'views/busyIndicatorDrtv.html',
+            replace: true,
+            scope: {},
+            controller: controller,
+            controllerAs: 'vm',
+            bindToController: true
+        };
+    }
 
-                    $rootScope.$on('progressBI', function(event, progress){
-                        $scope.progress = progress;
-                    });
+    controller.$inject = ['$scope', '$rootScope', '$timeout'];
 
-                    $rootScope.$on('stopBI', function(event, forced){
-                        if (forced){
-                            $scope.show = 0;
-                        } else if ($scope.show !== 0){
-                            $scope.show--; 
-                        }
-                        $scope.progress = null;
-                    });
+    function controller($scope, $rootScope, $timeout) {
+        var ACTIVATION_DEBOUNCE_TIME_IN_MILLISECONDS = 500;
+        var vm = this;
+        vm.counter = 0;
+        vm.show = false;
+
+        $rootScope.$on('startBI', function () {
+            vm.counter++;
+        });
+
+        $rootScope.$on('stopBI', function (event, forced) {
+            if (forced) {
+                vm.counter = 0;
+            } else if (vm.counter > 0) {
+                vm.counter--;
+            }
+        });
+
+        $scope.$watch('vm.counter', function (newVal, oldVal) {
+            if (angular.equals(oldVal, newVal)) {
+                return;
+            }
+            setSpinnerVisibilityDebounceForActivation();
+
+            function setSpinnerVisibilityDebounceForActivation() {
+                if (vm.counter === 0) {
+                    vm.show = false;
                 }
-            };
-        }
-    ];
-
-    angular.module('app').directive('busyIndicator' ,drtv);
-}(angular));
+                $timeout(function () {
+                    if (vm.counter > 0) {
+                        vm.show = true;
+                    }
+                }, ACTIVATION_DEBOUNCE_TIME_IN_MILLISECONDS);
+            }
+        });
+    }
+} (angular));
