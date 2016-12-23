@@ -35,7 +35,7 @@
 		function api(cfg) {
 			applyCfgDefaults(cfg);
 			signalToStartBusyIndicator(cfg);
-			
+
 			var url = getUrlFromCfg(cfg);
 			var method = getMethodFromCfg(cfg);
 			var data = getDataFromCfg(cfg);
@@ -168,6 +168,7 @@
 				$rootScope.$broadcast('startBI');
 			}
 		}
+
 		function signalToStopBusyIndicator(cfg) {
 			if (!cfg.disableBI) {
 				$rootScope.$broadcast('stopBI');
