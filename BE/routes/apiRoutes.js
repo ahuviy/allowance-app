@@ -6,10 +6,10 @@ const passport = require('passport');
 const Promise = require('bluebird'); // use bluebird promises
 
 // load db-models
-const accountsModel = require('../models/accounts');
-const transactionsModel = require('../models/transactions');
-const usersModel = require('../models/users');
-const uniqueModel = require('../models/uniqueAccountNumbers.js');
+const AccountModel = require('../models/accounts');
+const TransactionModel = require('../models/transactions');
+const UserModel = require('../models/users');
+const UniqueModel = require('../models/uniqueAccountNumbers.js');
 
 // use body-parser middleware to parse json requests
 router.use(bodyParser.json());
@@ -26,75 +26,68 @@ const verify = require('../verify');
 router.post('/api/login', loginWithUsername);
 
 function loginWithUsername(req, res, next) {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) { next(err); }
+    passport.authenticate('local', { session: false }, authCallback)(req, res, next);
 
-        /**
-         * Passport-local-mongoose attempts to validate the user. If validation
-         * fails, user = false. If validation succeeds, user contains the user-model
-         * for the user attempting to log-in.
-         */
+    // Passport-local-mongoose attempts to validate the user by adding the 'salt'
+    // to the password, hashing the concatenated string, and comparing to the 'hash'
+    // field in the user-model. If validation fails, user = false. If validation
+    // succeeds, user contains the user-model.
+    function authCallback(err, user, info) {
+        // this error will probably occur because of a db connection-error
+        // TODOahuvi: address this error specifically in error-handling.js
+        if (err) {
+            next(err);
+        }
 
         // validation failed, will return a 401, "Password or username are incorrect"
         if (!user) {
             return res.status(401).json({ error: info.message });
         }
 
-        // validation succeeded, define a custom callback
-        req.logIn(user, (err) => {
-            if (err) {
-                return res.status(500).json({ error: 'Could not log in user' });
-            }
-
-            // Create a private token for the user and send it
-            var token = verify.createToken({
-                "username": user.username,
-                "name": user.name
-            });
-            res.status(200).json({
-                status: 'Login successful!',
-                success: true,
-                token: token
-            });
+        // Create a private token for the user and send it
+        var token = verify.createToken({
+            username: user.username,
+            name: user.name
         });
-    })(req, res, next);
+        res.status(200).json({
+            status: 'Login successful!',
+            success: true,
+            token: token
+        });
+    }
 }
 
 
-// Server expects body to contain (JSON): 'username', 'password', 'name'. Optional field: 'email'
 router.post('/api/register', addParent);
 
 function addParent(req, res) {
-    usersModel.register(new usersModel({
+    var newParent = new UserModel({
         username: req.body.username,
         name: req.body.name,
         type: 'parent',
         email: req.body.email || ''
-    }), req.body.password, (err, parent) => {
+    });
+    UserModel.register(newParent, req.body.password, registrationCallback);
+
+    function registrationCallback(err) {
         if (err) {
             // error will almost certainly occur if username already exists
             res.status(409).json({ error: err });
         }
-
-        parent.save((err) => {
-            if (err) { res.status(500).json({ error: err }); }
-            passport.authenticate('local')(req, res, () => {
-                res.status(200).json({ status: 'Registration Successful!' });
-            });
-        });
-    });
+        res.status(200).json({ status: 'Registration successful' });
+    }
 }
 
 
 // TODOahuvi: loginWithFacebook
 
 
-router.get('/api/children/:parentUsername', verify.loggedIn, getChildren);
+router.get('/api/children/:parentUsername', verify.isLoggedIn, getChildren);
 
 function getChildren(req, res) {
-    usersModel
+    UserModel
         .findOne({ username: req.params.parentUsername })
-        .then(parent => usersModel.find({ parentId: parent._id }))
+        .then(parent => UserModel.find({ parentId: parent._id }))
         .then(children => {
             res.status(200).send({
                 children: children,
@@ -104,14 +97,14 @@ function getChildren(req, res) {
 }
 
 
-router.get('/api/children/get/:childId', verify.loggedIn, getChildById);
+router.get('/api/children/get/:childId', verify.isLoggedIn, getChildById);
 
 function getChildById(req, res) {
     Promise
         .join(
-        accountsModel.findOne({ userId: req.params.childId }),
-        transactionsModel.find({ userId: req.params.childId }),
-        usersModel.findById(req.params.childId),
+        AccountModel.findOne({ userId: req.params.childId }),
+        TransactionModel.find({ userId: req.params.childId }),
+        UserModel.findById(req.params.childId),
         (account, transactions, user) => {
             res.json({
                 account: account,
@@ -123,7 +116,7 @@ function getChildById(req, res) {
 }
 
 
-router.post('/api/children/:parentUsername', verify.loggedIn, addChild);
+router.post('/api/children/:parentUsername', verify.isLoggedIn, addChild);
 
 function addChild(req, res) {
     var findParentPromise = findParent();
@@ -133,7 +126,7 @@ function addChild(req, res) {
     respondWithChildUser(createChildAccountPromise, createChildUserPromise);
 
     function findParent() {
-        return usersModel
+        return UserModel
             .findOne({ username: req.params.parentUsername })
             .catch(err => res.status(500).send({ msg: 'error finding parent', err: err }));
     }
@@ -141,7 +134,7 @@ function addChild(req, res) {
     function createChildUser(findParentPromise) {
         return findParentPromise
             .then(parent => {
-                var promise = usersModel.create({
+                var promise = UserModel.create({
                     username: req.body.accountNo,
                     password: req.body.password,
                     name: req.body.name,
@@ -159,7 +152,7 @@ function addChild(req, res) {
     function createChildAccount(createChildUserPromise) {
         createChildUserPromise
             .then(child => {
-                var promise = accountsModel.create({
+                var promise = AccountModel.create({
                     userId: child._id,
                     name: req.body.name,
                     interestRate: req.body.interestRate,
@@ -190,13 +183,13 @@ function addChild(req, res) {
 }
 
 
-router.post('/api/account/:childId/update', verify.loggedIn, updateChild);
+router.post('/api/account/:childId/update', verify.isLoggedIn, updateChild);
 
 function updateChild(req, res) {
     console.log('received updateChild request');
 
     // update child account
-    accountsModel.update({ userId: req.body.userId }, {
+    AccountModel.update({ userId: req.body.userId }, {
         $set: {
             name: req.body.name,
             interestRate: req.body.interestRate,
@@ -207,7 +200,7 @@ function updateChild(req, res) {
         console.log('finished modifying the child account');
 
         // update child user
-        usersModel.update({ _id: req.body.userId }, {
+        UserModel.update({ _id: req.body.userId }, {
             $set: {
                 name: req.body.name,
                 password: req.body.password
@@ -223,15 +216,15 @@ function updateChild(req, res) {
 }
 
 
-router.get('/api/account/:childId/delete', verify.loggedIn, deleteChild);
+router.get('/api/account/:childId/delete', verify.isLoggedIn, deleteChild);
 
 function deleteChild(req, res) {
-    var childPromise = usersModel
+    var childPromise = UserModel
         .findById(req.params.childId)
         .catch(err => res.status(500).send({ err: err, msg: 'can\'t find child' }));
 
     var parentPromise = childPromise
-        .then(child => usersModel.findById(child.parentId))
+        .then(child => UserModel.findById(child.parentId))
         .catch(err => res.status(500).send({ err: err, msg: 'can\'t find parent' }));
 
     Promise
@@ -251,13 +244,13 @@ function deleteChild(req, res) {
     }
 
     function recycleAccountNo(child) {
-        uniqueModel.create({ number: child.username });
+        UniqueModel.create({ number: child.username });
     }
 
     function deleteAllChildDbModelsAndRespond() {
-        accountsModel.remove({ userId: req.params.childId }, () => {
-            transactionsModel.remove({ userId: req.params.childId }, () => {
-                usersModel.remove({ _id: req.params.childId }, () => {
+        AccountModel.remove({ userId: req.params.childId }, () => {
+            TransactionModel.remove({ userId: req.params.childId }, () => {
+                UserModel.remove({ _id: req.params.childId }, () => {
                     res.json('successfully deleted child');
                 });
             });
@@ -266,11 +259,11 @@ function deleteChild(req, res) {
 }
 
 
-router.post('/api/account/:accountId/deposit', verify.loggedIn, deposit);
+router.post('/api/account/:accountId/deposit', verify.isLoggedIn, deposit);
 
 function deposit(req, res) {
     // set 'performedBy' field to parentId instead of parentUsername
-    usersModel.findOne({ username: req.body.performedBy }, (err, parentUser) => {
+    UserModel.findOne({ username: req.body.performedBy }, (err, parentUser) => {
         if (err) { res.status(500).send('db error'); }
         req.body.performedBy = parentUser._id;
 
@@ -284,7 +277,7 @@ function deposit(req, res) {
 
             // if sum is 0 allowance is set to 'none'
             var setAllowance = (req.body.sum === 0) ? 'none' : req.body.depositType;
-            accountsModel.update({ userId: req.body.userId }, {
+            AccountModel.update({ userId: req.body.userId }, {
                 $set: {
                     allowance: setAllowance,
                     allowanceAmount: req.body.sum
@@ -293,7 +286,7 @@ function deposit(req, res) {
                 if (err) { res.status(500).json(err); }
                 console.log('finished modifying the account allowance');
 
-                accountsModel.findOne({ userId: req.body.userId }, (err, account) => {
+                AccountModel.findOne({ userId: req.body.userId }, (err, account) => {
 
                     // respond with {account: accountObj, transaction: null}
                     res.json({
@@ -307,7 +300,7 @@ function deposit(req, res) {
              * PERFORM A DEPOSIT
              */
             // modify balance
-            accountsModel.findOne({ userId: req.body.userId }, (err, account) => {
+            AccountModel.findOne({ userId: req.body.userId }, (err, account) => {
                 console.log('updating account balance');
                 account.balance = account.balance + req.body.sum;
                 account.save((err, resp) => {
@@ -316,7 +309,7 @@ function deposit(req, res) {
 
                     // add entry to the transactions
                     console.log('adding the new transaction');
-                    transactionsModel.create(req.body, (err, transaction) => {
+                    TransactionModel.create(req.body, (err, transaction) => {
                         // respond with {accountObj, transactionsObj}
                         res.json({
                             account: account,
@@ -330,21 +323,21 @@ function deposit(req, res) {
 }
 
 
-router.post('/api/account/:accountId/withdraw', verify.loggedIn, withdraw);
+router.post('/api/account/:accountId/withdraw', verify.isLoggedIn, withdraw);
 
 function withdraw(req, res) {
 
     // set 'performedBy' field to parentId instead of parentUsername
-    usersModel.findOne({ username: req.body.performedBy }, (err, parentUser) => {
+    UserModel.findOne({ username: req.body.performedBy }, (err, parentUser) => {
         if (err) { res.status(500).send('db error'); }
         req.body.performedBy = parentUser._id;
 
         // add entry to the transactions collection
         console.log('adding the new transaction');
-        transactionsModel.create(req.body, (err, transaction) => {
+        TransactionModel.create(req.body, (err, transaction) => {
 
             // modify the account balance
-            accountsModel.findOne({ userId: transaction.userId }, (err, account) => {
+            AccountModel.findOne({ userId: transaction.userId }, (err, account) => {
                 console.log('updating account balance');
                 account.balance = account.balance - req.body.sum;
                 account.save((err, resp) => {
@@ -362,14 +355,14 @@ function withdraw(req, res) {
 }
 
 
-router.get('/api/account/generate', verify.loggedIn, generateNewAccountNumber);
+router.get('/api/account/generate', verify.isLoggedIn, generateNewAccountNumber);
 
 function generateNewAccountNumber(req, res) {
     // get a unique account number from the unique-model
-    uniqueModel.findOne({}, (err, uniqueEntry) => {
+    UniqueModel.findOne({}, (err, uniqueEntry) => {
         console.log('found a unique-account-number: ' + uniqueEntry.number);
         // remove the fetched unique entry from the db
-        uniqueModel.remove({ number: uniqueEntry.number }, (err, resp) => {
+        UniqueModel.remove({ number: uniqueEntry.number }, (err, resp) => {
             if (err) { res.status(500).json(err); }
             console.log('removed unique-account-number entry from db');
             // respond with the unique account-number
@@ -383,7 +376,7 @@ function generateNewAccountNumber(req, res) {
 router.post('/api/account/cancel/:accountNo', cancelNewAccountNumber);
 
 function cancelNewAccountNumber(req, res) {
-    uniqueModel.create({ number: req.params.accountNo }, (err, uniqueEntry) => {
+    UniqueModel.create({ number: req.params.accountNo }, (err, uniqueEntry) => {
         console.log('recycled the unique-account-number: ' + uniqueEntry.number);
 
         res.json(uniqueEntry.number);
@@ -405,8 +398,8 @@ router.get('/api/account/init', (req, res) => {
     initAccountNumCollection();
 
     function initAccountNumCollection() {
-        for (var i = 100; i < 300; i++) {
-            uniqueModel.create({ number: i });
+        for (var i = 100; i < 500; i++) {
+            UniqueModel.create({ number: i });
         }
         res.status(200).send('generated new account numbers');
     }
