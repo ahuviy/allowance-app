@@ -135,10 +135,8 @@
 
 
 		/**
-		 * 1) Attempts to mock a server response.
-		 * 2) Attempts to use a previously-cached-response.
-		 * 3) Sends a real HTTP request to the server.
-		 * Note: only supports GET/POST requests.
+		 * Attempts to mock a server response --> Attempts to use a previously-cached-response
+		 * --> Sends an HTTP server-request. NOTE: only supports GET/POST requests.
 		 * @param {Object} cfg Contains the options for the API request:
 		 *   type {String} Specifies the api action to be taken (see apiMap.js).
 		 *   data {Object} The data to pass in POST requests.
@@ -160,10 +158,12 @@
 				.catch(resHandle.handleResponseErrors.bind(resHandle));
 		}
 
+		
 		function enableMockedResponses() {
 			MOCKUP_ENABLED = true;
 		}
 
+		
 		function disableMockedResponses() {
 			MOCKUP_ENABLED = false;
 		}

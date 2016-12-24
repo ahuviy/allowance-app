@@ -1,15 +1,15 @@
 (function (angular) {
 	angular
 		.module('app', ['ionic'])
-		.config(wireTheStates)
+		.config(wireUpTheStates)
 		.run(ionicStartup)
 		.run(reEnterLoginSession)
 		.value('_', window._); // to introduce lodash to DI in controllers/services
 
 	
-	wireTheStates.$inject = ['$stateProvider', '$urlRouterProvider'];
+	wireUpTheStates.$inject = ['$stateProvider', '$urlRouterProvider'];
 	
-	function wireTheStates($stateProvider, $urlRouterProvider) {
+	function wireUpTheStates($stateProvider, $urlRouterProvider) {
 		$urlRouterProvider.otherwise('/');
 		$stateProvider
 			.state('login', {
@@ -51,8 +51,8 @@
 	
 	function ionicStartup($ionicPlatform) {
 		$ionicPlatform.ready(function () {
-			// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-			// for form inputs)
+			// Hide the accessory bar by default (remove this to show the
+			// accessory bar above the keyboard for form inputs)
 			if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
 				cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
 				cordova.plugins.Keyboard.disableScroll(true);

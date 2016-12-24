@@ -6,13 +6,13 @@
     cacheSrvc.$inject = ['$cacheFactory', '$q'];
     
     function cacheSrvc($cacheFactory, $q) {
-        // functions to export
+        
+        // FUNCTIONS TO EXPORT
         this.get = get;
         this.getAsync = getAsync;
         this.store = store;
         this.storeAsync = storeAsync;
 
-        ////////////////////
 
         function get(cacheId, key) {
             return $cacheFactory.get(cacheId).get(key);

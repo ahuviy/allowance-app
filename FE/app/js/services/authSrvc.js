@@ -6,71 +6,78 @@
     authSrvc.$inject = ['locStoreSrvc', 'locStoreMap', '$http', 'cacheSrvc', 'cacheMap', 'routeSrvc'];
 
     function authSrvc(locStoreSrvc, locStoreMap, $http, cacheSrvc, cacheMap, routeSrvc) {
-        // functions to export
+
+        // FUNCTIONS TO EXPORT
         this.isAuthenticated = isAuthenticated;
         this.setLoggedInState = setLoggedInState;
         this.setLoggedOutState = setLoggedOutState;
-        this.redirectToLoginIfNotAuth = redirectToLoginIfNotAuth;
         this.redirectToHomeIfAuth = redirectToHomeIfAuth;
+        this.redirectToLoginIfNotAuth = redirectToLoginIfNotAuth;
 
-        ///////////////////////
+        
+        function Authenticator(credentials) {
+            this.credentials = credentials;
+        }
+        Authenticator.prototype.validateInputArgs = function () {
+            if (!this.credentials ||
+                this.credentials.username === undefined ||
+                this.credentials.token === undefined) {
+                throw new Error('Bad args were received in setLoggedInState.');
+            }
+        };
+        Authenticator.prototype.saveCredentialsInLocalStorage = function () {
+            locStoreSrvc.store(locStoreMap.credentials, {
+                username: this.credentials.username,
+                token: this.credentials.token
+            });
+        };
+        Authenticator.prototype.addUserTokenToHeaders = function () {
+            $http.defaults.headers.common['x-access-token'] = this.credentials.token;
+        };
 
-        /**
-         * Check the login-cache if the user is already logged-in.
-         * See app.js: 'reEnterLoginSession' for details
-         */
         function isAuthenticated() {
-            var loggedIn = cacheSrvc.get(cacheMap.login.id, cacheMap.login.keys.loggedIn);
-            return loggedIn ? true : false;
+            return getCachedLoggedInState() ? true : false;
         }
 
-        /**
-         * Go to login view if parent is not logged in
-         */
+        // credentials = { username: username, token: token }
+        function setLoggedInState(credentials) {
+            var auth = new Authenticator(credentials);
+            auth.validateInputArgs();
+            auth.saveCredentialsInLocalStorage();
+            setCachedLoggedInStateAs(true);
+            auth.addUserTokenToHeaders();
+        }
+
+        function setLoggedOutState() {
+            removeCredentialsFromLocalStorage();
+            setCachedLoggedInStateAs(false);
+            removeUserTokenFromHeaders();
+        }
+        
+        function removeCredentialsFromLocalStorage() {
+            locStoreSrvc.remove(locStoreMap.credentials);
+            locStoreSrvc.remove(locStoreMap.parentName);
+        }
+        
+        function removeUserTokenFromHeaders() {
+            $http.defaults.headers.common['x-access-token'] = undefined;
+        }
+
+        function redirectToHomeIfAuth() {
+            if (isAuthenticated()) { routeSrvc.go('home', true); }
+        }
+        
         function redirectToLoginIfNotAuth() {
             if (!isAuthenticated()) { routeSrvc.go('login', true); }
         }
 
-        /**
-         * Go to home view if parent is already logged in
-         */
-        function redirectToHomeIfAuth() {
-            if (isAuthenticated()) { routeSrvc.go('home', true); }
+        function getCachedLoggedInState() {
+            return cacheSrvc.get(cacheMap.login.id, cacheMap.login.keys.loggedIn);
         }
 
-        /**
-         * Set the user-state as logged-in:
-         * 1) save the user credentials {username, token} in local-storage
-         * 2) set the loggedIn state as 'true' in the cache
-         * 3) set the user token as a header for all future HTTP requests
-         * @param {Object} credentials should contain username and token fields.
-         */
-        function setLoggedInState(credentials) {
-            if (!credentials ||
-                credentials.username === undefined ||
-                credentials.token === undefined) {
-                throw new Error('Bad args were received in setLoggedInState.');
-            }
-            locStoreSrvc.store(locStoreMap.credentials, {
-                username: credentials.username,
-                token: credentials.token
-            });
-            cacheSrvc.store(cacheMap.login.id, cacheMap.login.keys.loggedIn, true);
-            $http.defaults.headers.common['x-access-token'] = credentials.token;
-        }
-
-        /**
-         * Set the user-state as logged-out:
-         * 1) delete the user credentials {username, token} from local-storage
-         * 1.1) delete the user parentName from local-storage
-         * 2) set the loggedIn state as 'false' in the cache
-         * 3) remove the user-token-header for all future HTTP requests
-         */
-        function setLoggedOutState() {
-            locStoreSrvc.remove(locStoreMap.credentials);
-            locStoreSrvc.remove(locStoreMap.parentName);
-            cacheSrvc.store(cacheMap.login.id, cacheMap.login.keys.loggedIn, false);
-            $http.defaults.headers.common['x-access-token'] = undefined;
+        // newState = true|false
+        function setCachedLoggedInStateAs(newState) {
+            cacheSrvc.store(cacheMap.login.id, cacheMap.login.keys.loggedIn, newState);
         }
     }
 })(angular);
