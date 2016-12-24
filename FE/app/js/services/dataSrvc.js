@@ -6,15 +6,133 @@
 	dataSrvc.$inject = ['$rootScope', 'apiMap', 'mockupMap', '_', '$http', '$q', 'ionErrorHandlerSrvc', 'cacheSrvc', 'cacheMap'];
 
 	function dataSrvc($rootScope, apiMap, mockupMap, _, $http, $q, ionErrorHandlerSrvc, cacheSrvc, cacheMap) {
-		// functions to export
-		this.api = api;						// performs an API request
-		this.getApiUrl = getApiUrl;			// gets the URL for a specified API request
-		this.enableMockup = enableMockup;	// sets whether api() will check for mocked responses.
+		
+		// FUNCTIONS TO EXPORT
+		this.api = api;										   // performs an API request
+		this.enableMockedResponses = enableMockedResponses;	   // sets api() to check for mocked responses.
+		this.disableMockedResponses = disableMockedResponses;  // sets api() to NOT check for mocked responses.
 
 		/////////////////////
 
-		var _mockupEnabled = true;
+		var MOCKUP_ENABLED = true;
 
+		/////////////////////
+
+		function CfgUtilities() { }
+		CfgUtilities.prototype._getUrl = function () {
+			var requestSettings = apiMap[this.cfg.type];
+			return requestSettings.url ||
+				this._compileUrlTemplate(requestSettings.urlTemplate, this.cfg.urlParams);
+		};
+		CfgUtilities.prototype._getMethod = function () {
+			return apiMap[this.cfg.type].method;
+		};
+		CfgUtilities.prototype._getData = function () {
+			var requestSettings = apiMap[this.cfg.type];
+			return requestSettings.noPayload ? null : this.cfg.data;
+		};
+		CfgUtilities.prototype._applyCfgDefaults = function () {
+			if (this.cfg.useCachedRes === undefined) {
+				this.cfg.useCachedRes = false;
+			}
+			if (this.cfg.saveResToCache === undefined) {
+				this.cfg.saveResToCache = false;
+			}
+		};
+		CfgUtilities.prototype._compileUrlTemplate = function (template, params) {
+			return _.template(template)(params);
+		};
+
+		function ResponseGenerator(cfg) {
+			this.cfg = cfg;
+			this._applyCfgDefaults();
+			this.url = this._getUrl();
+			this.method = this._getMethod();
+			this.data = this._getData();
+		}
+		ResponseGenerator.prototype = Object.create(CfgUtilities.prototype);
+		ResponseGenerator.prototype.generateResponsePromise = function () {
+			var responsePromise;
+			this._signalToStartBusyIndicator();
+			if (MOCKUP_ENABLED) {
+				responsePromise = this._attemptMockResponse();
+			}
+			if (!responsePromise && this.cfg.useCachedRes) {
+				responsePromise = this._attemptCachedResponse();
+			}
+			if (!responsePromise) {
+				responsePromise = this._makeHttpRequest();
+			}
+			return responsePromise;
+		};
+		ResponseGenerator.prototype._signalToStartBusyIndicator = function () {
+			if (!this.cfg.disableBI) {
+				$rootScope.$broadcast('startBI');
+			}
+		};
+		ResponseGenerator.prototype._attemptMockResponse = function () {
+			if (mockupMap[this.url] &&
+				mockupMap[this.url].method === this.method &&
+				angular.equals(mockupMap[this.url].data, this.data)) {
+				return $q.resolve(mockupMap[this.url].mockup);
+			} else {
+				return undefined;
+			}
+		};
+		ResponseGenerator.prototype._attemptCachedResponse = function () {
+			var cacheId = this.method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
+			var cachedResponse = cacheSrvc.get(cacheId, this.url);
+			return cachedResponse ? $q.resolve(cachedResponse) : undefined;
+		};
+		ResponseGenerator.prototype._makeHttpRequest = function () {
+			if (this.method === 'POST') {
+				return $http.post(this.url, this.data, this.cfg.reqConfig);
+			} else if (this.method === 'GET') {
+				return $http.get(this.url, this.cfg.reqConfig);
+			} else {
+				throw new Error('API requests can only be GET or POST.');
+			}
+		};
+
+		function ResponseHandler(cfg) {
+			this.cfg = cfg;
+			this._applyCfgDefaults();
+			this.url = this._getUrl();
+			this.method = this._getMethod();
+		}
+		ResponseHandler.prototype = Object.create(CfgUtilities.prototype);
+		ResponseHandler.prototype.finalizeApiCall = function (response) {
+			var apiSuccessEvent = apiMap[this.cfg.type].event;
+			if (apiSuccessEvent) {
+				$rootScope.$broadcast(apiSuccessEvent);
+			}
+			if (this.cfg.saveResToCache) {
+				this._saveResponseToCache(response);
+			}
+			this._signalToStopBusyIndicator();
+			return $q.resolve(response);
+		};
+		ResponseHandler.prototype.handleResponseErrors = function (response) {
+			this._signalToStopBusyIndicator();
+			this._showErrorMessage(response);
+			return $q.reject(response);
+		};
+		ResponseHandler.prototype._saveResponseToCache = function (response) {
+			var cacheId = this.method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
+			cacheSrvc.store(cacheId, this.url, response);
+		};
+		ResponseHandler.prototype._signalToStopBusyIndicator = function () {
+			if (!this.cfg.disableBI) {
+				$rootScope.$broadcast('stopBI');
+			}
+		};
+		ResponseHandler.prototype._showErrorMessage = function (response) {
+			if (!this.cfg.disableAutoErrorHandler) {
+				ionErrorHandlerSrvc.show(this.cfg.specialErrorHandlerData || response.data);
+			}
+		};
+
+		
 		/**
 		 * 1) Attempts to mock a server response.
 		 * 2) Attempts to use a previously-cached-response.
@@ -33,171 +151,20 @@
 		 * @returns {Promise}
 		 */
 		function api(cfg) {
-			applyCfgDefaults(cfg);
-			signalToStartBusyIndicator(cfg);
+			var resGen = new ResponseGenerator(cfg);
+			var resHandle = new ResponseHandler(cfg);
 
-			var url = getUrlFromCfg(cfg);
-			var method = getMethodFromCfg(cfg);
-			var data = getDataFromCfg(cfg);
-			var responsePromise;
-
-			if (_mockupEnabled) {
-				responsePromise = attemptMockResponse(url, method, data);
-			}
-			if (!responsePromise && cfg.useCachedRes) {
-				responsePromise = attemptCachedResponse(method, url);
-			}
-			if (!responsePromise) {
-				responsePromise = makeHttpRequest(method, url, data, cfg.reqConfig);
-			}
-			return responsePromise.then(
-				function (response) {
-					return finalizeApiCall(response, cfg);
-				},
-				function (response) {
-					return handleResponseErrors(response, cfg);
-				}
-			);
+			return resGen.generateResponsePromise()
+				.then(resHandle.finalizeApiCall.bind(resHandle))
+				.catch(resHandle.handleResponseErrors.bind(resHandle));
 		}
 
-		function applyCfgDefaults(cfg) {
-			if (cfg.useCachedRes === undefined) {
-				cfg.useCachedRes = false;
-			}
-			if (cfg.saveResToCache === undefined) {
-				cfg.saveResToCache = false;
-			}
+		function enableMockedResponses() {
+			MOCKUP_ENABLED = true;
 		}
 
-		/**
-		 * Compile a URL-template into a URL using specified params.
-		 * @param {String} template the URL template.
-		 * @param {Object} params the parameters to use for compilation.
-		 * @returns {String}
-		 */
-		function compileUrl(template, params) {
-			return _.template(template)(params);
-		}
-
-		/**
-		 * Retrieves the URL that is used in a specified API request.
-		 * @param {String} type the type of API request.
-		 * @param {Object} params parameters used to compile a urlTemplate.
-		 * @returns {String}
-		 */
-		function getApiUrl(type, params) {
-			return apiMap[type].url || compileUrl(apiMap[type].urlTemplate, params);
-		}
-
-		/**
-		 * Check the mockupMap if there is a mocked response
-		 * available for the specified request.
-		 * @param {String} url the request-URL.
-		 * @param {String} method 'GET' | 'POST'.
-		 * @param {Object} data the data to pass in POST requests.
-		 * @returns {Promise|null} a mocked-response-promise, or null if not found. 
-		 */
-		function attemptMockResponse(url, method, data) {
-			if (mockupMap[url] &&
-				mockupMap[url].method === method &&
-				angular.equals(mockupMap[url].data, data)) {
-				return $q.resolve(mockupMap[url].mockup);
-			} else {
-				return undefined;
-			}
-		}
-
-		function attemptCachedResponse(method, url) {
-			var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-			var cachedResponse = cacheSrvc.get(cacheId, url);
-			return cachedResponse ? $q.resolve(cachedResponse) : undefined;
-		}
-
-		function makeHttpRequest(method, url, data, config) {
-			if (method === 'POST') {
-				return $http.post(url, data, config);
-			} else if (method === 'GET') {
-				return $http.get(url, config);
-			} else {
-				throw new Error('API requests can only be GET or POST.');
-			}
-		}
-
-		function finalizeApiCall(response, cfg) {
-			var apiSuccessEvent = apiMap[cfg.type].event;
-			if (apiSuccessEvent) {
-				$rootScope.$broadcast(apiSuccessEvent);
-			}
-			if (cfg.saveResToCache) {
-				saveResponseToCache(response, cfg);
-			}
-			signalToStopBusyIndicator(cfg);
-			return $q.resolve(response);
-		}
-
-		function handleResponseErrors(response, cfg) {
-			signalToStopBusyIndicator(cfg);
-			showErrorMessage(response, cfg);
-			return $q.reject(response);
-		}
-
-		function saveResponseToCache(response, cfg) {
-			var url = getUrlFromCfg(cfg);
-			var method = getMethodFromCfg(cfg);
-			var cacheId = method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-			cacheSrvc.store(cacheId, url, response);
-		}
-
-		function getUrlFromCfg(cfg) {
-			var requestSettings = apiMap[cfg.type];
-			return requestSettings.url ||
-				compileUrl(requestSettings.urlTemplate, cfg.urlParams);
-		}
-
-		function getMethodFromCfg(cfg) {
-			return apiMap[cfg.type].method;
-		}
-
-		function getDataFromCfg(cfg) {
-			var requestSettings = apiMap[cfg.type];
-			return requestSettings.noPayload ? null : cfg.data;
-		}
-
-		function signalToStartBusyIndicator(cfg) {
-			if (!cfg.disableBI) {
-				$rootScope.$broadcast('startBI');
-			}
-		}
-
-		function signalToStopBusyIndicator(cfg) {
-			if (!cfg.disableBI) {
-				$rootScope.$broadcast('stopBI');
-			}
-		}
-
-		function showErrorMessage(response, cfg) {
-			if (!cfg.disableAutoErrorHandler) {
-				ionErrorHandlerSrvc.show(cfg.specialErrorHandlerData || response.data);
-			}
-		}
-
-		/**
-		 * Set the default API behavior whether to check for mocked responses.
-		 * @param {Function|Boolean} condition a boolean or a function that returns a boolean.
-		 */
-		function enableMockup(condition) {
-			var retval;
-			if (angular.isFunction(condition)) {
-				retval = condition();
-				if (typeof retval !== 'boolean') {
-					throw new Error('condition evaluates to a non-boolean.');
-				}
-			} else if (typeof condition === 'boolean') {
-				retval = condition;
-			} else {
-				throw new Error('condition is of wrong type.');
-			}
-			_mockupEnabled = retval;
+		function disableMockedResponses() {
+			MOCKUP_ENABLED = false;
 		}
 	}
 })(angular);
