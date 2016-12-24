@@ -6,17 +6,15 @@
 	dataSrvc.$inject = ['$rootScope', 'apiMap', 'mockupMap', '_', '$http', '$q', 'ionErrorHandlerSrvc', 'cacheSrvc', 'cacheMap'];
 
 	function dataSrvc($rootScope, apiMap, mockupMap, _, $http, $q, ionErrorHandlerSrvc, cacheSrvc, cacheMap) {
-		
+
 		// FUNCTIONS TO EXPORT
 		this.api = api;										   // performs an API request
 		this.enableMockedResponses = enableMockedResponses;	   // sets api() to check for mocked responses.
 		this.disableMockedResponses = disableMockedResponses;  // sets api() to NOT check for mocked responses.
 
-		/////////////////////
 
 		var MOCKUP_ENABLED = true;
 
-		/////////////////////
 
 		function CfgUtilities() { }
 		CfgUtilities.prototype._getUrl = function () {
@@ -102,10 +100,7 @@
 		}
 		ResponseHandler.prototype = Object.create(CfgUtilities.prototype);
 		ResponseHandler.prototype.finalizeApiCall = function (response) {
-			var apiSuccessEvent = apiMap[this.cfg.type].event;
-			if (apiSuccessEvent) {
-				$rootScope.$broadcast(apiSuccessEvent);
-			}
+			this._signalSuccessfulApi();
 			if (this.cfg.saveResToCache) {
 				this._saveResponseToCache(response);
 			}
@@ -116,6 +111,12 @@
 			this._signalToStopBusyIndicator();
 			this._showErrorMessage(response);
 			return $q.reject(response);
+		};
+		ResponseHandler.prototype._signalSuccessfulApi = function () {
+			var successfulApiEvent = apiMap[this.cfg.type].event;
+			if (successfulApiEvent) {
+				$rootScope.$broadcast(successfulApiEvent);
+			}
 		};
 		ResponseHandler.prototype._saveResponseToCache = function (response) {
 			var cacheId = this.method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
@@ -132,7 +133,7 @@
 			}
 		};
 
-		
+
 		/**
 		 * 1) Attempts to mock a server response.
 		 * 2) Attempts to use a previously-cached-response.
