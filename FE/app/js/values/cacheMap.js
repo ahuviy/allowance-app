@@ -22,8 +22,16 @@
                 id: 'apiGet',
                 keys: {}
             },
+            apiDelete: {
+                id: 'apiDelete',
+                keys: {}
+            },
             apiPost: {
                 id: 'apiPost',
+                keys: {}
+            },
+            apiPut: {
+                id: 'apiPut',
                 keys: {}
             }
 		};

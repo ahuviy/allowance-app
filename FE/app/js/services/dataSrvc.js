@@ -16,20 +16,19 @@
 		var MOCKUP_ENABLED = true;
 
 
-		function CfgUtilities() { }
-		CfgUtilities.prototype._getUrl = function () {
-			var requestSettings = apiMap[this.cfg.type];
-			return requestSettings.url ||
-				this._compileUrlTemplate(requestSettings.urlTemplate, this.cfg.urlParams);
+		function ResponseBaseUtils() { }
+		ResponseBaseUtils.prototype._getUrl = function () {
+			var requestSpec = apiMap[this.cfg.type];
+			return requestSpec.url ||
+				this._compileUrlTemplate(requestSpec.urlTemplate, this.cfg.urlParams);
 		};
-		CfgUtilities.prototype._getMethod = function () {
+		ResponseBaseUtils.prototype._getMethod = function () {
 			return apiMap[this.cfg.type].method;
 		};
-		CfgUtilities.prototype._getData = function () {
-			var requestSettings = apiMap[this.cfg.type];
-			return requestSettings.noPayload ? null : this.cfg.data;
+		ResponseBaseUtils.prototype._getData = function () {
+			return apiMap[this.cfg.type].noPayload ? null : this.cfg.data;
 		};
-		CfgUtilities.prototype._applyCfgDefaults = function () {
+		ResponseBaseUtils.prototype._applyCfgDefaults = function () {
 			if (this.cfg.useCachedRes === undefined) {
 				this.cfg.useCachedRes = false;
 			}
@@ -37,8 +36,22 @@
 				this.cfg.saveResToCache = false;
 			}
 		};
-		CfgUtilities.prototype._compileUrlTemplate = function (template, params) {
-			return _.template(template)(params);
+		ResponseBaseUtils.prototype._compileUrlTemplate = function (urlTemplate, params) {
+			return _.template(urlTemplate)(params);
+		};
+		ResponseBaseUtils.prototype._getCacheId = function () {
+			switch (this.method) {
+				case 'GET':
+					return cacheMap.apiGet.id;
+				case 'POST':
+					return cacheMap.apiPost.id;
+				case 'PUT':
+					return cacheMap.apiPut.id;
+				case 'DELETE':
+					return cacheMap.apiDelete.id;
+				default:
+					throw new Error('Bad API method');
+			}
 		};
 
 		function ResponseGenerator(cfg) {
@@ -48,7 +61,7 @@
 			this.method = this._getMethod();
 			this.data = this._getData();
 		}
-		ResponseGenerator.prototype = Object.create(CfgUtilities.prototype);
+		ResponseGenerator.prototype = Object.create(ResponseBaseUtils.prototype);
 		ResponseGenerator.prototype.generateResponsePromise = function () {
 			var responsePromise;
 			this._signalToStartBusyIndicator();
@@ -78,17 +91,20 @@
 			}
 		};
 		ResponseGenerator.prototype._attemptCachedResponse = function () {
-			var cacheId = this.method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-			var cachedResponse = cacheSrvc.get(cacheId, this.url);
+			var cachedResponse = cacheSrvc.get(this._getCacheId(), this.url);
 			return cachedResponse ? $q.resolve(cachedResponse) : undefined;
 		};
 		ResponseGenerator.prototype._makeHttpRequest = function () {
 			if (this.method === 'POST') {
 				return $http.post(this.url, this.data, this.cfg.reqConfig);
+			} else if (this.method === 'PUT') {
+				return $http.put(this.url, this.data, this.cfg.reqConfig);
 			} else if (this.method === 'GET') {
 				return $http.get(this.url, this.cfg.reqConfig);
+			} else if (this.method === 'DELETE') {
+				return $http.get(this.url, this.cfg.reqConfig);
 			} else {
-				throw new Error('API requests can only be GET or POST.');
+				throw new Error('Bad method for API request.');
 			}
 		};
 
@@ -98,7 +114,7 @@
 			this.url = this._getUrl();
 			this.method = this._getMethod();
 		}
-		ResponseHandler.prototype = Object.create(CfgUtilities.prototype);
+		ResponseHandler.prototype = Object.create(ResponseBaseUtils.prototype);
 		ResponseHandler.prototype.finalizeApiCall = function (response) {
 			this._signalSuccessfulApi();
 			if (this.cfg.saveResToCache) {
@@ -119,8 +135,7 @@
 			}
 		};
 		ResponseHandler.prototype._saveResponseToCache = function (response) {
-			var cacheId = this.method === 'POST' ? cacheMap.apiPost.id : cacheMap.apiGet.id;
-			cacheSrvc.store(cacheId, this.url, response);
+			cacheSrvc.store(this._getCacheId(), this.url, response);
 		};
 		ResponseHandler.prototype._signalToStopBusyIndicator = function () {
 			if (!this.cfg.disableBI) {
@@ -159,12 +174,12 @@
 				.catch(resHandle.handleResponseErrors.bind(resHandle));
 		}
 
-		
+
 		function enableMockedResponses() {
 			MOCKUP_ENABLED = true;
 		}
 
-		
+
 		function disableMockedResponses() {
 			MOCKUP_ENABLED = false;
 		}
