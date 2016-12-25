@@ -53,8 +53,8 @@
 			}
 		};
 		ModalGenerator.prototype.createOverlay = function () {
-			var modalTemplate = ionOverlayMap[this.options.type];
-			return $ionicModal.fromTemplateUrl(modalTemplate.templateUrl, {
+			var modalSpec = ionOverlayMap[this.options.type];
+			return $ionicModal.fromTemplateUrl(modalSpec.templateUrl, {
 				animation: this.options.animation,
 				scope: this.overlayScope
 			});

@@ -136,7 +136,8 @@
 
 		/**
 		 * Attempts to mock a server response --> Attempts to use a previously-cached-response
-		 * --> Sends an HTTP server-request. NOTE: only supports GET/POST requests.
+		 * --> Sends an HTTP server-request --> Can save response in cache --> Passes response errors
+		 * to the error-handler. NOTE: only supports GET/POST requests.
 		 * @param {Object} cfg Contains the options for the API request:
 		 *   type {String} Specifies the api action to be taken (see apiMap.js).
 		 *   data {Object} The data to pass in POST requests.
