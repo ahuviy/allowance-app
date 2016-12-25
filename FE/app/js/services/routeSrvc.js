@@ -7,9 +7,11 @@
     
     function routeSrvc($ionicHistory, $state) {
         
-        // FUNCTIONS TO EXPORT
-        this.go = go;
-        this.reload = reload;
+        var FUNCTIONS_TO_EXPORT = {
+            go: go,
+            reload: reload
+        };
+        Object.assign(this, FUNCTIONS_TO_EXPORT);
 
         
         function go(state, disableBackBtn) {

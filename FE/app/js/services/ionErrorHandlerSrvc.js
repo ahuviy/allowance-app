@@ -7,8 +7,10 @@
 
 	function ionErrorHandlerSrvc($q, overlaySrvc) {
 
-		// FUNCTIONS TO EXPORT
-		this.show = show;
+		var FUNCTIONS_TO_EXPORT = {
+            show: show
+        };
+        Object.assign(this, FUNCTIONS_TO_EXPORT);
 
 
 		function show(errorData) {

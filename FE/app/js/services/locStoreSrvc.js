@@ -7,11 +7,13 @@
     
     function locStoreSrvc($window) {
         
-        // FUNCTIONS TO EXPORT
-        this.store = store;
-        this.get = get;
-        this.remove = remove;
-        this.removeAll = removeAll;
+        var FUNCTIONS_TO_EXPORT = {
+            store: store,
+            get: get,
+            remove: remove,
+            removeAll: removeAll
+        };
+        Object.assign(this, FUNCTIONS_TO_EXPORT);
 
 
         function store(key, value) {

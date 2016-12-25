@@ -7,10 +7,12 @@
 
 	function overlaySrvc($q, $ionicModal, $rootScope, ionOverlayMap, $ionicPopup, routeSrvc) {
 
-		// FUNCTIONS TO EXPORT
-		this.setOverlay = setOverlay;
-		this.alertPopup = alertPopup;
-		this.confirmPopup = confirmPopup;
+		var FUNCTIONS_TO_EXPORT = {
+            setOverlay: setOverlay,
+			alertPopup: alertPopup,
+			confirmPopup: confirmPopup
+        };
+        Object.assign(this, FUNCTIONS_TO_EXPORT);
 
 
 		function ModalGenerator(options) {

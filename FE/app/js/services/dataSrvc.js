@@ -7,12 +7,14 @@
 
 	function dataSrvc($rootScope, apiMap, mockupMap, _, $http, $q, ionErrorHandlerSrvc, cacheSrvc, cacheMap) {
 
-		// FUNCTIONS TO EXPORT
-		this.api = api;										   // performs an API request
-		this.enableMockedResponses = enableMockedResponses;	   // sets api() to check for mocked responses.
-		this.disableMockedResponses = disableMockedResponses;  // sets api() to NOT check for mocked responses.
+		var FUNCTIONS_TO_EXPORT = {
+			api: api,										// performs an API request
+			enableMockedResponses: enableMockedResponses,	// sets api() to check for mocked responses.
+			disableMockedResponses: disableMockedResponses  // sets api() to NOT check for mocked responses.
+		};
+		Object.assign(this, FUNCTIONS_TO_EXPORT);
 
-
+		
 		var MOCKUP_ENABLED = true;
 
 

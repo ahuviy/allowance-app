@@ -18,7 +18,7 @@
     controller.$inject = ['$scope', '$rootScope', '$timeout'];
 
     function controller($scope, $rootScope, $timeout) {
-        var ACTIVATION_DELAY_IN_MILLISECONDS = 500;
+        var ACTIVATION_DELAY_IN_MILLISECONDS = 300;
         var vm = this;
         vm.counter = 0;
         vm.show = false;

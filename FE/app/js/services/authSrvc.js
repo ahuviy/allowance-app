@@ -7,14 +7,16 @@
 
     function authSrvc(locStoreSrvc, locStoreMap, $http, cacheSrvc, cacheMap, routeSrvc) {
 
-        // FUNCTIONS TO EXPORT
-        this.isAuthenticated = isAuthenticated;
-        this.setLoggedInState = setLoggedInState;
-        this.setLoggedOutState = setLoggedOutState;
-        this.redirectToHomeIfAuth = redirectToHomeIfAuth;
-        this.redirectToLoginIfNotAuth = redirectToLoginIfNotAuth;
+        var FUNCTIONS_TO_EXPORT = {
+            isAuthenticated: isAuthenticated,
+            setLoggedInState: setLoggedInState,
+            setLoggedOutState: setLoggedOutState,
+            redirectToHomeIfAuth: redirectToHomeIfAuth,
+            redirectToLoginIfNotAuth: redirectToLoginIfNotAuth
+        };
+        Object.assign(this, FUNCTIONS_TO_EXPORT);
 
-        
+
         function Authenticator(credentials) {
             this.credentials = credentials;
         }
@@ -53,12 +55,12 @@
             setCachedLoggedInStateAs(false);
             removeUserTokenFromHeaders();
         }
-        
+
         function removeCredentialsFromLocalStorage() {
             locStoreSrvc.remove(locStoreMap.credentials);
             locStoreSrvc.remove(locStoreMap.parentName);
         }
-        
+
         function removeUserTokenFromHeaders() {
             $http.defaults.headers.common['x-access-token'] = undefined;
         }
@@ -66,7 +68,7 @@
         function redirectToHomeIfAuth() {
             if (isAuthenticated()) { routeSrvc.go('home', true); }
         }
-        
+
         function redirectToLoginIfNotAuth() {
             if (!isAuthenticated()) { routeSrvc.go('login', true); }
         }
