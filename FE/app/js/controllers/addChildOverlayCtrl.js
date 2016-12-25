@@ -3,9 +3,9 @@
         .module('app')
         .controller('addChildOverlayCtrl', addChildOverlayCtrl);
 
-    addChildOverlayCtrl.$inject = ['$scope', 'dataSrvc', 'authSrvc', 'ionErrorHandlerSrvc'];
+    addChildOverlayCtrl.$inject = ['$scope', 'dataSrvc', 'authSrvc', 'overlaySrvc'];
 
-    function addChildOverlayCtrl(addChildOverlayCtrl, dataSrvc, authSrvc, ionErrorHandlerSrvc) {
+    function addChildOverlayCtrl(addChildOverlayCtrl, dataSrvc, authSrvc, overlaySrvc) {
 
         var $scope = this;
 
@@ -36,7 +36,7 @@
 
             $scope.deleteChild = function () {
                 var msg = 'Do you want to delete ' + $scope.dataToSubmit.name + '?';
-                ionErrorHandlerSrvc.confirmPopup('Are you sure?', msg, sendDeleteReq);
+                overlaySrvc.confirmPopup('Are you sure?', msg, sendDeleteReq);
             };
         }
 

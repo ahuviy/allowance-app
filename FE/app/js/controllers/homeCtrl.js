@@ -3,8 +3,8 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['dataSrvc', 'ionOverlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
-    function HomeCtrl(dataSrvc, ionOverlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
+    HomeCtrl.$inject = ['dataSrvc', 'overlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
+    function HomeCtrl(dataSrvc, overlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
         var credentials;
 		var $scope = this;
 
@@ -34,14 +34,14 @@
         }
 
         $scope.logout = function() {
-            ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
+            overlaySrvc.confirmPopup('Are you sure?', null, function() {
                 authSrvc.setLoggedOutState();
                 routeSrvc.go('login', true);
             });
         };
 
         $scope.openAddChildModal = function() {
-            ionOverlaySrvc.setOverlay({ type: 'addChild' }).then(apiAddChild);
+            overlaySrvc.setOverlay({ type: 'addChild' }).then(apiAddChild);
         };
 
         function apiAddChild(child) {

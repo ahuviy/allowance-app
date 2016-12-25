@@ -3,9 +3,9 @@
         .module('app')
         .controller('LoginCtrl', LoginCtrl);
 
-    LoginCtrl.$inject = ['dataSrvc', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
+    LoginCtrl.$inject = ['dataSrvc', 'authSrvc', 'overlaySrvc', 'routeSrvc'];
 
-    function LoginCtrl(dataSrvc, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
+    function LoginCtrl(dataSrvc, authSrvc, overlaySrvc, routeSrvc) {
         var $scope = this;
 
         init();
@@ -67,7 +67,7 @@
                 // Popup an alert dialog
                 var msg = 'Thanks for registering, ' + registerData.name +
                     '! You can now log in using your username and password.';
-                ionErrorHandlerSrvc.alertPopup('Registration Successful!', msg);
+                overlaySrvc.alertPopup('Registration Successful!', msg);
             });
         }
     }

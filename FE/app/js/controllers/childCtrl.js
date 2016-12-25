@@ -3,9 +3,9 @@
 		.module('app')
 		.controller('ChildCtrl', ChildCtrl);
 
-	ChildCtrl.$inject = ['$stateParams', 'dataSrvc', 'ionOverlaySrvc', '$state', 'authSrvc'];
+	ChildCtrl.$inject = ['$stateParams', 'dataSrvc', 'overlaySrvc', '$state', 'authSrvc'];
 
-	function ChildCtrl($stateParams, dataSrvc, ionOverlaySrvc, $state, authSrvc) {
+	function ChildCtrl($stateParams, dataSrvc, overlaySrvc, $state, authSrvc) {
 		var childPassword;
 		var childAccountNo;
 		var $scope = this;
@@ -37,7 +37,7 @@
 				type: 'deposit',
 				inject: { childId: $stateParams.childId }
 			};
-			ionOverlaySrvc.setOverlay(overlayCfg).then(apiDeposit);
+			overlaySrvc.setOverlay(overlayCfg).then(apiDeposit);
 		};
 
 		$scope.openWithdrawModal = function () {
@@ -45,7 +45,7 @@
 					type: 'withdraw',
 					inject: { childId: $stateParams.childId }
 				};
-			ionOverlaySrvc.setOverlay(overlayCfg).then(apiWithdraw);
+			overlaySrvc.setOverlay(overlayCfg).then(apiWithdraw);
 		};
 
 		$scope.openAddChildModal = function () {
@@ -58,7 +58,7 @@
 					title: 'Update ' + $scope.child.name
 				}
 			};
-			ionOverlaySrvc.setOverlay(overlayCfg).then(
+			overlaySrvc.setOverlay(overlayCfg).then(
 				apiUpdateChild,
 				// optional redirect if canceling the modal
 				function (redirect) {

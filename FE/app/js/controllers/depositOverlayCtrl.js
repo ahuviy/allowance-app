@@ -3,9 +3,9 @@
         .module('app')
         .controller('depositOverlayCtrl', depositOverlayCtrl);
 
-    depositOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc', 'ionErrorHandlerSrvc', 'locStoreMap'];
+    depositOverlayCtrl.$inject = ['$scope', 'locStoreSrvc', 'authSrvc', 'locStoreMap', 'overlaySrvc'];
 
-    function depositOverlayCtrl(depositOverlayCtrl, locStoreSrvc, authSrvc, ionErrorHandlerSrvc, locStoreMap) {
+    function depositOverlayCtrl(depositOverlayCtrl, locStoreSrvc, authSrvc, locStoreMap, overlaySrvc) {
         var credentials;
         var $scope = this;
 
@@ -37,7 +37,7 @@
         }
 
         $scope.submitDeposit = function() {
-            ionErrorHandlerSrvc.confirmPopup('Are you sure?', null, function() {
+            overlaySrvc.confirmPopup('Are you sure?', null, function() {
                 // set timestamp
                 $scope.dataToSubmit.timestamp = Date.parse(new Date());
 
