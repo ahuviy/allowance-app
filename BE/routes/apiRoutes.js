@@ -1,6 +1,5 @@
 // get the modules
 const express = require('express');
-const bodyParser = require('body-parser');
 const router = express.Router();
 const passport = require('passport');
 const Promise = require('bluebird'); // use bluebird promises
@@ -12,10 +11,19 @@ const UserModel = require('../models/users');
 const UniqueModel = require('../models/uniqueAccountNumbers.js');
 
 // use body-parser middleware to parse json requests
+const bodyParser = require('body-parser');
 router.use(bodyParser.json());
 
 // this module manages the JSON web-tokens and verifies user identities
 const verify = require('../verify');
+
+
+function RouteException(message, status) {
+    Error.call(this, message);
+    this.type = 'RouteException';
+    this.status = status || 500;
+}
+RouteException.prototype = Object.create(Error.prototype);
 
 
 /******************************************************************************
@@ -409,14 +417,6 @@ router.get('/api/account/init', (req, res) => {
         res.status(200).send('generated new account numbers');
     }
 });
-
-
-function RouteException(message, status) {
-    this.type = 'RouteException';
-    this.message = message || '';
-    this.status = status || 500;
-}
-RouteException.prototype = new Error();
 
 
 module.exports = router;
