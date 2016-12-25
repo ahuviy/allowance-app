@@ -186,33 +186,38 @@ function addChild(req, res) {
 router.post('/api/account/:childId/update', verify.isLoggedIn, updateChild);
 
 function updateChild(req, res) {
-    console.log('received updateChild request');
+    var updateAccountPromise = updateChildAccount();
+    var updateUserPromise = updateChildUser();
+    Promise.join(
+        updateAccountPromise,
+        updateUserPromise,
+        res.status(200).send('Successfully updated child')
+    );
 
-    // update child account
-    AccountModel.update({ userId: req.body.userId }, {
-        $set: {
-            name: req.body.name,
-            interestRate: req.body.interestRate,
-            rebateRate: req.body.rebateRate
-        }
-    }, (err, rawResponse) => {
-        if (err) { res.status(500).json(err); }
-        console.log('finished modifying the child account');
+    function updateChildAccount() {
+        return AccountModel
+            .update({ userId: req.body.userId }, {
+                $set: {
+                    name: req.body.name,
+                    interestRate: req.body.interestRate,
+                    rebateRate: req.body.rebateRate
+                }
+            })
+            .exec()
+            .catch(err => res.status(500).json(err));
+    }
 
-        // update child user
-        UserModel.update({ _id: req.body.userId }, {
-            $set: {
-                name: req.body.name,
-                password: req.body.password
-            }
-        }, (err, rawResponse) => {
-            if (err) { res.status(500).json(err); }
-            console.log('finished modifying the child user');
-
-            // respond with newChild data
-            res.status(200).send('Successfully updated child');
-        });
-    });
+    function updateChildUser() {
+        return UserModel
+            .update({ _id: req.body.userId }, {
+                $set: {
+                    name: req.body.name,
+                    password: req.body.password
+                }
+            })
+            .exec()
+            .catch(err => res.status(500).json(err));
+    }
 }
 
 
