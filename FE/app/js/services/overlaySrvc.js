@@ -30,10 +30,7 @@
 			this.overlayScope = this.options.scope.$new();
 		};
 		ModalGenerator.prototype.injectVarsIntoOverlayScope = function () {
-			angular.forEach(this.options.inject, injectVars, this);
-			function injectVars(value, key) {
-				this.overlayScope[key] = value;
-			}
+			Object.assign(this.overlayScope, this.options.inject);
 		};
 		ModalGenerator.prototype.insertTerminationFuncsInOverlayScope = function () {
 			this.overlayScope.resolveModal = resolveModal.bind(this);
