@@ -30,6 +30,20 @@
 		ResponseBaseUtils.prototype._getData = function () {
 			return apiMap[this.cfg.type].noPayload ? null : this.cfg.data;
 		};
+		ResponseBaseUtils.prototype._getCacheId = function () {
+			switch (this.method) {
+				case 'GET':
+					return cacheMap.apiGet.id;
+				case 'POST':
+					return cacheMap.apiPost.id;
+				case 'PUT':
+					return cacheMap.apiPut.id;
+				case 'DELETE':
+					return cacheMap.apiDelete.id;
+				default:
+					throw new Error('Bad API method');
+			}
+		};
 		ResponseBaseUtils.prototype._assignCfgDefaults = function () {
 			var defaults = {
 				useCachedRes: false,
@@ -63,18 +77,14 @@
 		ResponseBaseUtils.prototype._compileUrlTemplate = function (urlTemplate, params) {
 			return _.template(urlTemplate)(params);
 		};
-		ResponseBaseUtils.prototype._getCacheId = function () {
-			switch (this.method) {
-				case 'GET':
-					return cacheMap.apiGet.id;
-				case 'POST':
-					return cacheMap.apiPost.id;
-				case 'PUT':
-					return cacheMap.apiPut.id;
-				case 'DELETE':
-					return cacheMap.apiDelete.id;
-				default:
-					throw new Error('Bad API method');
+		ResponseBaseUtils.prototype._signalToStartBusyIndicator = function () {
+			if (!this.cfg.disableBI) {
+				$rootScope.$broadcast('startBI');
+			}
+		};
+		ResponseBaseUtils.prototype._signalToStopBusyIndicator = function () {
+			if (!this.cfg.disableBI) {
+				$rootScope.$broadcast('stopBI');
 			}
 		};
 
@@ -100,11 +110,6 @@
 				responsePromise = this._makeHttpRequest();
 			}
 			return responsePromise;
-		};
-		ResponseGenerator.prototype._signalToStartBusyIndicator = function () {
-			if (!this.cfg.disableBI) {
-				$rootScope.$broadcast('startBI');
-			}
 		};
 		ResponseGenerator.prototype._attemptMockResponse = function () {
 			if (mockupMap[this.url] &&
@@ -163,11 +168,6 @@
 		};
 		ResponseHandler.prototype._saveResponseToCache = function (response) {
 			cacheSrvc.store(this._getCacheId(), this.url, response);
-		};
-		ResponseHandler.prototype._signalToStopBusyIndicator = function () {
-			if (!this.cfg.disableBI) {
-				$rootScope.$broadcast('stopBI');
-			}
 		};
 		ResponseHandler.prototype._showErrorMessage = function (response) {
 			ionErrorHandlerSrvc.show(this.cfg.errorMsgText || response.data);
