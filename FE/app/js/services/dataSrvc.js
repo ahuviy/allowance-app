@@ -14,7 +14,7 @@
 		};
 		Object.assign(this, FUNCTIONS_TO_EXPORT);
 
-		
+
 		var MOCKUP_ENABLED = true;
 
 
@@ -30,12 +30,34 @@
 		ResponseBaseUtils.prototype._getData = function () {
 			return apiMap[this.cfg.type].noPayload ? null : this.cfg.data;
 		};
-		ResponseBaseUtils.prototype._applyCfgDefaults = function () {
-			if (this.cfg.useCachedRes === undefined) {
-				this.cfg.useCachedRes = false;
+		ResponseBaseUtils.prototype._assignCfgDefaults = function () {
+			var defaults = {
+				useCachedRes: false,
+				saveResToCache: false,
+				disableErrorMsg: false,
+				disableBI: false
+			};
+			this.cfg = Object.assign({}, defaults, this.cfg);
+		};
+		ResponseBaseUtils.prototype._checkInput = function () {
+			if (!this.cfg) {
+				throw new Error('must specify a cfg arg');
 			}
-			if (this.cfg.saveResToCache === undefined) {
-				this.cfg.saveResToCache = false;
+			if (!this.cfg.type) {
+				throw new Error('missing type parameter');
+			}
+			var reqSpec = apiMap[this.cfg.type];
+			if (!reqSpec) {
+				throw new Error('apiMap doesn\'t contain entry that corresponds to given type');
+			}
+			if(['POST', 'PUT'].indexOf(reqSpec.method) > -1 && !this.cfg.data && !reqSpec.noPayload) {
+				throw new Error('PUT and POST methods must have data or a noPayload flag');
+			}
+			if (!reqSpec.url && !reqSpec.urlTemplate) {
+				throw new Error('must specify a url or urlTemplate in apiMap');
+			}
+			if (!reqSpec.url && reqSpec.urlTemplate && !this.cfg.urlParams) {
+				throw new Error('when using urlTemplate you must include urlParams');
 			}
 		};
 		ResponseBaseUtils.prototype._compileUrlTemplate = function (urlTemplate, params) {
@@ -58,7 +80,8 @@
 
 		function ResponseGenerator(cfg) {
 			this.cfg = cfg;
-			this._applyCfgDefaults();
+			this._assignCfgDefaults();
+			this._checkInput();
 			this.url = this._getUrl();
 			this.method = this._getMethod();
 			this.data = this._getData();
@@ -104,7 +127,7 @@
 			} else if (this.method === 'GET') {
 				return $http.get(this.url, this.cfg.reqConfig);
 			} else if (this.method === 'DELETE') {
-				return $http.get(this.url, this.cfg.reqConfig);
+				return $http.delete(this.url, this.cfg.reqConfig);
 			} else {
 				throw new Error('Bad method for API request.');
 			}
@@ -112,7 +135,7 @@
 
 		function ResponseHandler(cfg) {
 			this.cfg = cfg;
-			this._applyCfgDefaults();
+			this._assignCfgDefaults();
 			this.url = this._getUrl();
 			this.method = this._getMethod();
 		}
@@ -127,7 +150,9 @@
 		};
 		ResponseHandler.prototype.handleResponseErrors = function (response) {
 			this._signalToStopBusyIndicator();
-			this._showErrorMessage(response);
+			if (!this.cfg.disableErrorMsg) {
+				this._showErrorMessage(response);
+			}
 			return $q.reject(response);
 		};
 		ResponseHandler.prototype._signalSuccessfulApi = function () {
@@ -145,9 +170,7 @@
 			}
 		};
 		ResponseHandler.prototype._showErrorMessage = function (response) {
-			if (!this.cfg.disableAutoErrorHandler) {
-				ionErrorHandlerSrvc.show(this.cfg.specialErrorHandlerData || response.data);
-			}
+			ionErrorHandlerSrvc.show(this.cfg.errorMsgText || response.data);
 		};
 
 
@@ -156,15 +179,15 @@
 		 * --> Sends an HTTP server-request --> Can save response in cache --> Passes response errors
 		 * to the error-handler.
 		 * @param {Object} cfg Contains the options for the API request:
-		 *   type {String} Specifies the api action to be taken (see apiMap.js).
-		 *   data {Object} The data to pass in POST requests.
-		 *   urlParams {Object} Parameters to compile the urlTemplate into a url.
-		 *   useCachedRes {Boolean} Attempt to retrieve a previously-cached-response. Defaults to false.
-		 *   saveResToCache {Boolean} Indicate whether to cache the response. Defaults to false.
-		 *   reqConfig {Object} Config options to pass to the HTTP request. See angular docs: $http.
-		 *   disableBI {Boolean} Disable the busy-indicator (see busyIndicatorDrtv.js).
-		 *   disableAutoErrorHandler {Boolean} Disables the error-handler.
-		 *   specialErrorHandlerData {String} Special text that replaces the default error text.
+		 *   {String}  type:            Specifies the api action to be taken (see apiMap.js).
+		 *   {Object}  data:            The data to pass in POST requests.
+		 *   {Object}  urlParams:       Parameters to compile the urlTemplate into a url.
+		 *   {Boolean} useCachedRes:    Attempt to retrieve a previously-cached-response. Default: false.
+		 *   {Boolean} saveResToCache:  Indicate whether to cache the response. Default: false.
+		 *   {Object}  reqConfig:       Optional config to pass to the HTTP request. See angular docs: $http.
+		 *   {Boolean} disableBI:       Disable the busy-indicator (see busyIndicatorDrtv.js). Default: false.
+		 *   {Boolean} disableErrorMsg: Disables the error-message for an unsuccessful request. Default: false.
+		 *   {String}  errorMsgText:    Optional text that replaces the default error-text.
 		 * @returns {Promise}
 		 */
 		function api(cfg) {
