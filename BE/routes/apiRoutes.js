@@ -31,7 +31,7 @@ RouteException.prototype = Object.create(Error.prototype);
  *****************************************************************************/
 
 
-router.post('/api/login', loginWithUsername);
+router.post('/login', loginWithUsername);
 
 function loginWithUsername(req, res, next) {
     passport.authenticate('local', { session: false }, authCallback)(req, res, next);
@@ -66,7 +66,7 @@ function loginWithUsername(req, res, next) {
 }
 
 
-router.post('/api/register', addParent);
+router.post('/register', addParent);
 
 function addParent(req, res) {
     var newParent = new UserModel({
@@ -90,7 +90,7 @@ function addParent(req, res) {
 // TODOahuvi: loginWithFacebook
 
 
-router.get('/api/children/:parentUsername', verify.isLoggedIn, getChildren);
+router.get('/children/:parentUsername', verify.isLoggedIn, getChildren);
 
 function getChildren(req, res) {
     UserModel
@@ -105,7 +105,7 @@ function getChildren(req, res) {
 }
 
 
-router.get('/api/children/get/:childId', verify.isLoggedIn, getChildById);
+router.get('/children/get/:childId', verify.isLoggedIn, getChildById);
 
 function getChildById(req, res) {
     Promise
@@ -124,7 +124,7 @@ function getChildById(req, res) {
 }
 
 
-router.post('/api/children/:parentUsername', verify.isLoggedIn, addChild);
+router.post('/children/:parentUsername', verify.isLoggedIn, addChild);
 
 function addChild(req, res) {
     var findParentPromise = findParent();
@@ -191,7 +191,7 @@ function addChild(req, res) {
 }
 
 
-router.post('/api/account/:childId/update', verify.isLoggedIn, updateChild);
+router.post('/account/:childId/update', verify.isLoggedIn, updateChild);
 
 function updateChild(req, res) {
     var updateAccountPromise = updateChildAccount();
@@ -229,7 +229,7 @@ function updateChild(req, res) {
 }
 
 
-router.get('/api/account/:childId/delete', verify.isLoggedIn, deleteChild);
+router.get('/account/:childId/delete', verify.isLoggedIn, deleteChild);
 
 function deleteChild(req, res) {
     var childPromise = UserModel
@@ -272,7 +272,7 @@ function deleteChild(req, res) {
 }
 
 
-router.post('/api/account/:accountId/deposit', verify.isLoggedIn, deposit);
+router.post('/account/:accountId/deposit', verify.isLoggedIn, deposit);
 
 function deposit(req, res) {
     // set 'performedBy' field to parentId instead of parentUsername
@@ -336,7 +336,7 @@ function deposit(req, res) {
 }
 
 
-router.post('/api/account/:accountId/withdraw', verify.isLoggedIn, withdraw);
+router.post('/account/:accountId/withdraw', verify.isLoggedIn, withdraw);
 
 function withdraw(req, res) {
 
@@ -368,7 +368,7 @@ function withdraw(req, res) {
 }
 
 
-router.get('/api/account/generate', verify.isLoggedIn, generateNewAccountNumber);
+router.get('/account/generate', verify.isLoggedIn, generateNewAccountNumber);
 
 function generateNewAccountNumber(req, res) {
     // get a unique account number from the unique-model
@@ -386,7 +386,7 @@ function generateNewAccountNumber(req, res) {
 }
 
 
-router.post('/api/account/cancel/:accountNo', cancelNewAccountNumber);
+router.post('/account/cancel/:accountNo', cancelNewAccountNumber);
 
 function cancelNewAccountNumber(req, res) {
     UniqueModel.create({ number: req.params.accountNo }, (err, uniqueEntry) => {
@@ -402,7 +402,7 @@ function cancelNewAccountNumber(req, res) {
  * INITIALIZE ACCOUNT NUMBER COLLECTION
  * Create a collection of unique account numbers. This is done only once.
  */
-router.get('/api/account/init', (req, res) => {
+router.get('/account/init', (req, res) => {
     // TODOahuvi: generate using a smart algorithm:
     // get all the usernames that are numbers.
     // get all the available account numbers.

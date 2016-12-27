@@ -3,14 +3,18 @@
  *****************************************************************************/
 
 // Initialize app
-var express = require('express');
-var app = express();
-var config = require('./BE/config');        // contains app global vars
+const express = require('express');
+const app = express();
+const config = require('./BE/config');        // contains app global vars
 
 // Initialize MongoDB database
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');     // enables advanced mongoose promises
-mongoose.connect(config.mongoUrl);
+mongoose.connect(config.mongoUrl, null, err => {
+    if (err) {
+        throw new Error('couldn\'t connect to MongoDB');
+    }
+});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', console.log.bind(console, 'Connected correctly to MongoDB server'));
@@ -33,7 +37,7 @@ app.use(bodyParser.json());
 
 // REST API routing
 var apiRouter = require('./BE/routes/apiRoutes');
-app.use('/', apiRouter);
+app.use('/api', apiRouter);
 
 // Error handling
 var errorHandler = require('./BE/error-handling');
