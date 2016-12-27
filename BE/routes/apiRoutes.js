@@ -18,12 +18,15 @@ router.use(bodyParser.json());
 const verify = require('../verify');
 
 
-function RouteException(message, status) {
-    Error.call(this, message);
+function RouteException(err, message, status) {
     this.type = 'RouteException';
+    this.err = err || null;
     this.status = status || 500;
+    this.message = message || '';
+    this.stack = (new Error()).stack;
 }
 RouteException.prototype = Object.create(Error.prototype);
+RouteException.prototype.constructor = RouteException;
 
 
 /******************************************************************************
@@ -34,6 +37,7 @@ RouteException.prototype = Object.create(Error.prototype);
 router.post('/login', loginWithUsername);
 
 function loginWithUsername(req, res, next) {
+
     passport.authenticate('local', { session: false }, authCallback)(req, res, next);
 
     // Passport-local-mongoose attempts to validate the user by adding the 'salt'
@@ -41,49 +45,52 @@ function loginWithUsername(req, res, next) {
     // field in the user-model. If validation fails, user = false. If validation
     // succeeds, user contains the user-model.
     function authCallback(err, user, info) {
-        // this error will probably occur because of a db connection-error
-        // TODOahuvi: address this error specifically in error-handling.js
-        if (err) {
-            next(err);
-        }
+        try {
+            if (err) {
+                throw new RouteException(err, 'Probable db connection error', 500);
+            }
+            if (!user) {
+                // validation failed, will return a 401, "Password or username are incorrect"
+                return res.status(401).json({ error: info.message });
+            }
 
-        // validation failed, will return a 401, "Password or username are incorrect"
-        if (!user) {
-            return res.status(401).json({ error: info.message });
+            var token = verify.createToken({
+                username: user.username,
+                name: user.name
+            });
+            res.status(200).json({
+                status: 'Login successful!',
+                success: true,
+                token: token
+            });
         }
-
-        // Create a private token for the user and send it
-        var token = verify.createToken({
-            username: user.username,
-            name: user.name
-        });
-        res.status(200).json({
-            status: 'Login successful!',
-            success: true,
-            token: token
-        });
+        catch (exception) {
+            next(exception);
+        }
     }
 }
 
 
 router.post('/register', addParent);
 
-function addParent(req, res) {
+function addParent(req, res, next) {
     var newParent = new UserModel({
         username: req.body.username,
         name: req.body.name,
         type: 'parent',
         email: req.body.email || ''
     });
-    UserModel.register(newParent, req.body.password, registrationCallback);
-
-    function registrationCallback(err) {
-        if (err) {
-            // error will almost certainly occur if username already exists
-            res.status(409).json({ error: err });
+    UserModel.register(newParent, req.body.password, err => {
+        try {
+            if (err) {
+                throw new RouteException(err, 'username already exists (small chance of db connection error).', 409);
+            }
+            res.status(200).json({ status: 'Registration successful' });
         }
-        res.status(200).json({ status: 'Registration successful' });
-    }
+        catch (exception) {
+            next(exception);
+        }
+    });
 }
 
 
@@ -101,7 +108,8 @@ function getChildren(req, res) {
                 children: children,
                 parentName: req.decoded.name
             });
-        });
+        })
+        .catch(err => res.status(500).json(err));
 }
 
 
