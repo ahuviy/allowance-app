@@ -12,26 +12,26 @@
      */
     function cacheMap() {
 		return {
-            login: {
-                id: 'login',
+            LOGIN: {
+                id: 'LOGIN',
                 keys: {
-                    loggedIn: 'loggedIn' // {Boolean}
+                    LOGGED_IN: 'LOGGED_IN' // {Boolean}
                 }
             },
-            apiGet: {
-                id: 'apiGet',
+            API_GET: {
+                id: 'API_GET',
                 keys: {}
             },
-            apiDelete: {
-                id: 'apiDelete',
+            API_DELETE: {
+                id: 'API_DELETE',
                 keys: {}
             },
-            apiPost: {
-                id: 'apiPost',
+            API_POST: {
+                id: 'API_POST',
                 keys: {}
             },
-            apiPut: {
-                id: 'apiPut',
+            API_PUT: {
+                id: 'API_PUT',
                 keys: {}
             }
 		};

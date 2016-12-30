@@ -15,7 +15,7 @@
             // skip to login if parent is not authenticated
             authSrvc.redirectToLoginIfNotAuth();
 
-            credentials = locStoreSrvc.get(locStoreMap.credentials);
+            credentials = locStoreSrvc.get(locStoreMap.CREDENTIALS);
 
             // vars for the <select> html element
             $scope.selectDepositType = [

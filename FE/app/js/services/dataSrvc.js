@@ -33,13 +33,13 @@
 		ResponseBaseUtils.prototype._getCacheId = function () {
 			switch (this.method) {
 				case 'GET':
-					return cacheMap.apiGet.id;
+					return cacheMap.API_GET.id;
 				case 'POST':
-					return cacheMap.apiPost.id;
+					return cacheMap.API_POST.id;
 				case 'PUT':
-					return cacheMap.apiPut.id;
+					return cacheMap.API_PUT.id;
 				case 'DELETE':
-					return cacheMap.apiDelete.id;
+					return cacheMap.API_DELETE.id;
 				default:
 					throw new Error('Bad API method');
 			}

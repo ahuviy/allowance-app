@@ -4,12 +4,12 @@
 		.value('locStoreMap', locStoreMap());
 
 	/**
-       * {Object} locStoreMap contains all local-storage keys.
-       */
+     * {Object} locStoreMap contains all local-storage keys.
+     */
 	function locStoreMap() {
 		return {
-			credentials: 'credentials',
-			parentName: 'parentName'
+			CREDENTIALS: 'CREDENTIALS',
+			PARENT_NAME: 'PARENT_NAME'
 		};
 	}
 })(angular);

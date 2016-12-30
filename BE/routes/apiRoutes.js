@@ -17,16 +17,7 @@ router.use(bodyParser.json());
 // this module manages the JSON web-tokens and verifies user identities
 const verify = require('../verify');
 
-
-function RouteException(err, message, status) {
-    this.type = 'RouteException';
-    this.err = err || null;
-    this.status = status || 500;
-    this.message = message || '';
-    this.stack = (new Error()).stack;
-}
-RouteException.prototype = Object.create(Error.prototype);
-RouteException.prototype.constructor = RouteException;
+const exceptions = require('../exceptions');
 
 
 /******************************************************************************
@@ -47,7 +38,7 @@ function loginWithUsername(req, res, next) {
     function authCallback(err, user, info) {
         try {
             if (err) {
-                throw new RouteException(err, 'Probable db connection error', 500);
+                throw new exceptions.Route(err, 'Probable db connection error', 500);
             }
             if (!user) {
                 // validation failed, will return a 401, "Password or username are incorrect"
@@ -83,7 +74,8 @@ function addParent(req, res, next) {
     UserModel.register(newParent, req.body.password, err => {
         try {
             if (err) {
-                throw new RouteException(err, 'username already exists (small chance of db connection error).', 409);
+                var msg = 'username already exists (small chance of db connection error).';
+                throw new exceptions.Route(err, msg, 409);
             }
             res.status(200).json({ status: 'Registration successful' });
         }

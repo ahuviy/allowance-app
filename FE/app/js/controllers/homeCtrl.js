@@ -15,8 +15,8 @@
             authSrvc.redirectToLoginIfNotAuth();
 
             // retrieve the parent-credentials and parentName from local-storage
-            credentials = locStoreSrvc.get(locStoreMap.credentials);
-            $scope.parentName = locStoreSrvc.get(locStoreMap.parentName);
+            credentials = locStoreSrvc.get(locStoreMap.CREDENTIALS);
+            $scope.parentName = locStoreSrvc.get(locStoreMap.PARENT_NAME);
 
             // BE: get all the children of this parent
 			var apiCfg = {
@@ -29,7 +29,7 @@
 				$scope.parentName = res.data.parentName;
 				
 				// store parent-name in local-storage
-				locStoreSrvc.store(locStoreMap.parentName, res.data.parentName);
+				locStoreSrvc.store(locStoreMap.PARENT_NAME, res.data.parentName);
 			});
         }
 
