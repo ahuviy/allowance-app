@@ -1,6 +1,6 @@
 (function (angular) {
     angular
         .module('app')
-        .constant('DEFAULT_LANGUAGE', 'eng');
+        .constant('DEFAULT_LANGUAGE', 'en');
         
 } (angular));

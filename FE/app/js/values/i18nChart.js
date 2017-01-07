@@ -5,7 +5,8 @@
 
     function i18nChart() {
         return {
-            eng: {
+            en: {
+                HTML_DIR_ATTR: 'ltr',
                 home: {
                     logout: 'Log Out'
                 },
@@ -27,6 +28,9 @@
                     deposit: 'Deposit',
                     withdraw: 'Withdraw'
                 }
+            },
+            he: {
+                HTML_DIR_ATTR: 'rtl'
             }
         };
     }

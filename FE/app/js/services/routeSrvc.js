@@ -14,12 +14,13 @@
         Object.assign(this, FUNCTIONS_TO_EXPORT);
 
         
-        function go(state, disableBackBtn) {
+        function go(state, disableBackBtn, stateParams) {
             disableBackBtn = disableBackBtn || false;
+            stateParams = stateParams || {};
             if (disableBackBtn) {
                 $ionicHistory.nextViewOptions({ disableBack: true });
             }
-            $state.go(state);
+            $state.go(state, stateParams);
         }
 
         function reload() {
