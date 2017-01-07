@@ -64,7 +64,7 @@
 			if (!reqSpec) {
 				throw new Error('apiMap doesn\'t contain entry that corresponds to given type');
 			}
-			if(['POST', 'PUT'].indexOf(reqSpec.method) > -1 && !this.cfg.data && !reqSpec.noPayload) {
+			if (['POST', 'PUT'].indexOf(reqSpec.method) > -1 && !this.cfg.data && !reqSpec.noPayload) {
 				throw new Error('PUT and POST methods must have data or a noPayload flag');
 			}
 			if (!reqSpec.url && !reqSpec.urlTemplate) {
@@ -125,16 +125,17 @@
 			return cachedResponse ? $q.resolve(cachedResponse) : undefined;
 		};
 		ResponseGenerator.prototype._makeHttpRequest = function () {
-			if (this.method === 'POST') {
-				return $http.post(this.url, this.data, this.cfg.reqConfig);
-			} else if (this.method === 'PUT') {
-				return $http.put(this.url, this.data, this.cfg.reqConfig);
-			} else if (this.method === 'GET') {
-				return $http.get(this.url, this.cfg.reqConfig);
-			} else if (this.method === 'DELETE') {
-				return $http.delete(this.url, this.cfg.reqConfig);
-			} else {
-				throw new Error('Bad method for API request.');
+			switch (this.method) {
+				case 'POST':
+					return $http.post(this.url, this.data, this.cfg.reqConfig);
+				case 'PUT':
+					return $http.put(this.url, this.data, this.cfg.reqConfig);
+				case 'GET':
+					return $http.get(this.url, this.cfg.reqConfig);
+				case 'DELETE':
+					return $http.delete(this.url, this.cfg.reqConfig);
+				default:
+					throw new Error('Bad method for API request.');
 			}
 		};
 
@@ -180,7 +181,7 @@
 		 * to the error-handler.
 		 * @param {Object} cfg Contains the options for the API request:
 		 *   {String}  type:            Specifies the api action to be taken (see apiMap.js).
-		 *   {Object}  data:            The data to pass in POST requests.
+		 *   {Object}  data:            The data to pass in POST/PUT requests.
 		 *   {Object}  urlParams:       Parameters to compile the urlTemplate into a url.
 		 *   {Boolean} useCachedRes:    Attempt to retrieve a previously-cached-response. Default: false.
 		 *   {Boolean} saveResToCache:  Indicate whether to cache the response. Default: false.

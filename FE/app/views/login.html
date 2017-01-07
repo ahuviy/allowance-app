@@ -1,11 +1,11 @@
 <ion-view>
 	<ion-nav-title>
-    	{{vm.createNewAccount ? 'Register' : 'Login'}}
+    	{{vm.createNewAccount ? ('login.register' | i18n) : ('login.login' | i18n)}}
     </ion-nav-title>
 
 	<ion-nav-buttons side="secondary">
 		<button class="button button-clear button-positive" ng-click="vm.toggleSubmit()">
-			{{vm.createNewAccount ? 'Login' : 'Register'}}
+			{{vm.createNewAccount ? ('login.login' | i18n) : ('login.register' | i18n)}}
 		</button>
     </ion-nav-buttons>
 
@@ -16,7 +16,7 @@
 			   	ng-submit="vm.submit(vm.dataToSubmit)">
 			<div class="list">
 				<label class="item item-input item-floating-label">
-					<span class="input-label">Username</span>
+					<span class="input-label">{{'login.username' | i18n}}</span>
 					<input type="text"
 						   placeholder="Username"
 						   ng-model="vm.dataToSubmit.username"
@@ -24,7 +24,7 @@
 				</label>
 
 				<label class="item item-input item-floating-label">
-					<span class="input-label">Password</span>
+					<span class="input-label">{{'login.password' | i18n}}</span>
 					<input type="password"
 						   placeholder="Password"
 						   ng-model="vm.dataToSubmit.password"
@@ -33,7 +33,7 @@
 
 				<label 	class="item item-input item-floating-label"
 						ng-show="vm.createNewAccount">
-					<span class="input-label">Your Name</span>
+					<span class="input-label">{{'login.yourName' | i18n}}</span>
 					<input type="text"
 						   placeholder="Your Name"
 						   ng-model="vm.dataToSubmit.name"
@@ -42,7 +42,7 @@
 
 				<label 	class="item item-input item-floating-label"
 						ng-show="vm.createNewAccount">
-					<span class="input-label">Email (optional)</span>
+					<span class="input-label">{{'login.emailOptional' | i18n}}</span>
 					<input type="email"
 						   placeholder="Email (optional)"
 						   ng-model="vm.dataToSubmit.email">
@@ -52,13 +52,13 @@
 			<button type="submit"
 					class="button button-block button-positive"
 					ng-disabled="loginForm.$invalid">
-				{{vm.createNewAccount ? 'Register' : 'Login'}}
+				{{vm.createNewAccount ? ('login.register' | i18n) : ('login.login' | i18n)}}
 			</button>
 		</form>
 		
 		<div class="list">
 			<label class="item assertive" ng-show="vm.error">
-				Wrong username or password
+				{{'login.wrongCred | i18n'}}
 			</label>
 		</div>
 	</ion-content>

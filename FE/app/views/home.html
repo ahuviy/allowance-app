@@ -6,7 +6,11 @@
 				ng-click="vm.openAddChildModal()"></button>
     </ion-nav-buttons>
 	<ion-nav-buttons side="secondary">
-		<button class="button button-clear button-assertive" ng-click="vm.logout()">Log Out</button>
+		<button
+			class="button button-clear button-assertive"
+			ng-click="vm.logout()">
+			{{'home.logout' | i18n}}
+		</button>
     </ion-nav-buttons>
 	
 	<ion-content class="padding">

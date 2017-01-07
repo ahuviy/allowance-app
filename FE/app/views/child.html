@@ -1,11 +1,11 @@
 <ion-view>
-	<ion-nav-title>Summary for {{vm.child.name}}</ion-nav-title>
-	
+	<ion-nav-title>{{'child.summaryFor' | i18n}} {{vm.child.name}}</ion-nav-title>
+
 	<!-- HEADER -->
 	<ion-header-bar align-title="left" class="bar-subheader">
 		<div class="buttons">
 			<button class="button button-clear button-dark">
-				Current Balance: 
+				{{'child.currentBalance' | i18n}}:
 				<span ng-class="{'balanced':vm.child.balance>=0, 'assertive':vm.child.balance<0}">
 					{{vm.child.balance}}
 				</span>
@@ -14,14 +14,12 @@
 		<h1 class="title"></h1>
 		<div class="buttons">
 			<button class="button button-clear button-dark">
-				Allowance 
+				{{'child.allowance' | i18n}}:
 				<span ng-hide="vm.child.allowance==='none'">
+					<span class="positive">{{vm.child.allowanceAmount}}</span>
 					({{vm.child.allowance}})
 				</span>
-				<span>: </span>
-				<span ng-class="{'positive':vm.child.allowance !== 'none'}">
-					{{vm.child.allowance === 'none' ? 'none' : vm.child.allowanceAmount}}
-				</span>
+				<span ng-show="vm.child.allowance==='none'">{{'child.none' | i18n}}</span>
 			</button>
 		</div>
 	</ion-header-bar>
@@ -30,7 +28,7 @@
 	<ion-content class="has-header has-footer">
 		<div class="list">
 			<div class="item item-divider">
-				Transactions
+				{{'child.transactions' | i18n}}
 			</div>
 			<ul class="list" collection-repeat="transaction in vm.transactions | orderBy: '-date'">
 				<li class="item">
@@ -48,8 +46,8 @@
 	<!-- FOOTER -->
 	<ion-footer-bar class="bar-stable">
 		<div class="button-bar">
-			<a class="button button-clear button-balanced" ng-click="vm.openDepositModal()">Deposit</a>
-			<a class="button button-clear button-assertive" ng-click="vm.openWithdrawModal()">Withdraw</a>
+			<a class="button button-clear button-balanced" ng-click="vm.openDepositModal()">{{'child.deposit' | i18n}}</a>
+			<a class="button button-clear button-assertive" ng-click="vm.openWithdrawModal()">{{'child.withdraw' | i18n}}</a>
 			<a class="button button-clear button-calm icon ion-gear-a" ng-click="vm.openAddChildModal()"></a>
 		</div>
 	</ion-footer-bar>

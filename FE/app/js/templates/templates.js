@@ -89,13 +89,13 @@ angular.module('app').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/child.html',
     "<ion-view>\n" +
-    "	<ion-nav-title>Summary for {{vm.child.name}}</ion-nav-title>\n" +
-    "	\n" +
+    "	<ion-nav-title>{{'child.summaryFor' | i18n}} {{vm.child.name}}</ion-nav-title>\n" +
+    "\n" +
     "	<!-- HEADER -->\n" +
     "	<ion-header-bar align-title=\"left\" class=\"bar-subheader\">\n" +
     "		<div class=\"buttons\">\n" +
     "			<button class=\"button button-clear button-dark\">\n" +
-    "				Current Balance: \n" +
+    "				{{'child.currentBalance' | i18n}}:\n" +
     "				<span ng-class=\"{'balanced':vm.child.balance>=0, 'assertive':vm.child.balance<0}\">\n" +
     "					{{vm.child.balance}}\n" +
     "				</span>\n" +
@@ -104,14 +104,12 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "		<h1 class=\"title\"></h1>\n" +
     "		<div class=\"buttons\">\n" +
     "			<button class=\"button button-clear button-dark\">\n" +
-    "				Allowance \n" +
+    "				{{'child.allowance' | i18n}}:\n" +
     "				<span ng-hide=\"vm.child.allowance==='none'\">\n" +
+    "					<span class=\"positive\">{{vm.child.allowanceAmount}}</span>\n" +
     "					({{vm.child.allowance}})\n" +
     "				</span>\n" +
-    "				<span>: </span>\n" +
-    "				<span ng-class=\"{'positive':vm.child.allowance !== 'none'}\">\n" +
-    "					{{vm.child.allowance === 'none' ? 'none' : vm.child.allowanceAmount}}\n" +
-    "				</span>\n" +
+    "				<span ng-show=\"vm.child.allowance==='none'\">{{'child.none' | i18n}}</span>\n" +
     "			</button>\n" +
     "		</div>\n" +
     "	</ion-header-bar>\n" +
@@ -120,7 +118,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "	<ion-content class=\"has-header has-footer\">\n" +
     "		<div class=\"list\">\n" +
     "			<div class=\"item item-divider\">\n" +
-    "				Transactions\n" +
+    "				{{'child.transactions' | i18n}}\n" +
     "			</div>\n" +
     "			<ul class=\"list\" collection-repeat=\"transaction in vm.transactions | orderBy: '-date'\">\n" +
     "				<li class=\"item\">\n" +
@@ -138,8 +136,8 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "	<!-- FOOTER -->\n" +
     "	<ion-footer-bar class=\"bar-stable\">\n" +
     "		<div class=\"button-bar\">\n" +
-    "			<a class=\"button button-clear button-balanced\" ng-click=\"vm.openDepositModal()\">Deposit</a>\n" +
-    "			<a class=\"button button-clear button-assertive\" ng-click=\"vm.openWithdrawModal()\">Withdraw</a>\n" +
+    "			<a class=\"button button-clear button-balanced\" ng-click=\"vm.openDepositModal()\">{{'child.deposit' | i18n}}</a>\n" +
+    "			<a class=\"button button-clear button-assertive\" ng-click=\"vm.openWithdrawModal()\">{{'child.withdraw' | i18n}}</a>\n" +
     "			<a class=\"button button-clear button-calm icon ion-gear-a\" ng-click=\"vm.openAddChildModal()\"></a>\n" +
     "		</div>\n" +
     "	</ion-footer-bar>\n" +
@@ -234,7 +232,11 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "				ng-click=\"vm.openAddChildModal()\"></button>\n" +
     "    </ion-nav-buttons>\n" +
     "	<ion-nav-buttons side=\"secondary\">\n" +
-    "		<button class=\"button button-clear button-assertive\" ng-click=\"vm.logout()\">Log Out</button>\n" +
+    "		<button\n" +
+    "			class=\"button button-clear button-assertive\"\n" +
+    "			ng-click=\"vm.logout()\">\n" +
+    "			{{'home.logout' | i18n}}\n" +
+    "		</button>\n" +
     "    </ion-nav-buttons>\n" +
     "	\n" +
     "	<ion-content class=\"padding\">\n" +
@@ -256,12 +258,12 @@ angular.module('app').run(['$templateCache', function($templateCache) {
   $templateCache.put('views/login.html',
     "<ion-view>\n" +
     "	<ion-nav-title>\n" +
-    "    	{{vm.createNewAccount ? 'Register' : 'Login'}}\n" +
+    "    	{{vm.createNewAccount ? ('login.register' | i18n) : ('login.login' | i18n)}}\n" +
     "    </ion-nav-title>\n" +
     "\n" +
     "	<ion-nav-buttons side=\"secondary\">\n" +
     "		<button class=\"button button-clear button-positive\" ng-click=\"vm.toggleSubmit()\">\n" +
-    "			{{vm.createNewAccount ? 'Login' : 'Register'}}\n" +
+    "			{{vm.createNewAccount ? ('login.login' | i18n) : ('login.register' | i18n)}}\n" +
     "		</button>\n" +
     "    </ion-nav-buttons>\n" +
     "\n" +
@@ -272,7 +274,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "			   	ng-submit=\"vm.submit(vm.dataToSubmit)\">\n" +
     "			<div class=\"list\">\n" +
     "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Username</span>\n" +
+    "					<span class=\"input-label\">{{'login.username' | i18n}}</span>\n" +
     "					<input type=\"text\"\n" +
     "						   placeholder=\"Username\"\n" +
     "						   ng-model=\"vm.dataToSubmit.username\"\n" +
@@ -280,7 +282,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "				</label>\n" +
     "\n" +
     "				<label class=\"item item-input item-floating-label\">\n" +
-    "					<span class=\"input-label\">Password</span>\n" +
+    "					<span class=\"input-label\">{{'login.password' | i18n}}</span>\n" +
     "					<input type=\"password\"\n" +
     "						   placeholder=\"Password\"\n" +
     "						   ng-model=\"vm.dataToSubmit.password\"\n" +
@@ -289,7 +291,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "\n" +
     "				<label 	class=\"item item-input item-floating-label\"\n" +
     "						ng-show=\"vm.createNewAccount\">\n" +
-    "					<span class=\"input-label\">Your Name</span>\n" +
+    "					<span class=\"input-label\">{{'login.yourName' | i18n}}</span>\n" +
     "					<input type=\"text\"\n" +
     "						   placeholder=\"Your Name\"\n" +
     "						   ng-model=\"vm.dataToSubmit.name\"\n" +
@@ -298,7 +300,7 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "\n" +
     "				<label 	class=\"item item-input item-floating-label\"\n" +
     "						ng-show=\"vm.createNewAccount\">\n" +
-    "					<span class=\"input-label\">Email (optional)</span>\n" +
+    "					<span class=\"input-label\">{{'login.emailOptional' | i18n}}</span>\n" +
     "					<input type=\"email\"\n" +
     "						   placeholder=\"Email (optional)\"\n" +
     "						   ng-model=\"vm.dataToSubmit.email\">\n" +
@@ -308,13 +310,13 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "			<button type=\"submit\"\n" +
     "					class=\"button button-block button-positive\"\n" +
     "					ng-disabled=\"loginForm.$invalid\">\n" +
-    "				{{vm.createNewAccount ? 'Register' : 'Login'}}\n" +
+    "				{{vm.createNewAccount ? ('login.register' | i18n) : ('login.login' | i18n)}}\n" +
     "			</button>\n" +
     "		</form>\n" +
     "		\n" +
     "		<div class=\"list\">\n" +
     "			<label class=\"item assertive\" ng-show=\"vm.error\">\n" +
-    "				Wrong username or password\n" +
+    "				{{'login.wrongCred | i18n'}}\n" +
     "			</label>\n" +
     "		</div>\n" +
     "	</ion-content>\n" +

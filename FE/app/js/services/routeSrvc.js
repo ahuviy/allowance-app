@@ -17,7 +17,7 @@
         function go(state, disableBackBtn) {
             disableBackBtn = disableBackBtn || false;
             if (disableBackBtn) {
-                $ionicHistory.nextViewOptions({ disableBackBtn: true });
+                $ionicHistory.nextViewOptions({ disableBack: true });
             }
             $state.go(state);
         }
