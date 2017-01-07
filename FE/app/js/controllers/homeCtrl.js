@@ -3,9 +3,10 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['dataSrvc', 'overlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc'];
-    function HomeCtrl(dataSrvc, overlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc) {
+    HomeCtrl.$inject = ['dataSrvc', 'overlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc', 'i18nSrvc'];
+    function HomeCtrl(dataSrvc, overlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc, i18nSrvc) {
         var credentials;
+        var LANGUAGES = ['en', 'he'];
 		var $scope = this;
 
         init();
@@ -42,6 +43,12 @@
 
         $scope.openAddChildModal = function() {
             overlaySrvc.setOverlay({ type: 'addChild' }).then(apiAddChild);
+        };
+
+        $scope.changeLang = function () {
+            var current = i18nSrvc.getCurrentLang();
+            var next = LANGUAGES[0] === current ? LANGUAGES[1] : LANGUAGES[0];
+            i18nSrvc.setLangAs(next);
         };
 
         function apiAddChild(child) {

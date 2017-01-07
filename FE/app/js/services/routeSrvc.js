@@ -23,8 +23,9 @@
             $state.go(state, stateParams);
         }
 
-        function reload() {
-            $state.go($state.current, {}, { reload: true });
+        function reload(newParams) {
+            newParams = newParams || {};
+            $state.go($state.current, newParams, { reload: true });
         }
     }
 })(angular);

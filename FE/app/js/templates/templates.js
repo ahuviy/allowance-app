@@ -250,6 +250,8 @@ angular.module('app').run(['$templateCache', function($templateCache) {
     "			</div>\n" +
     "		</div>\n" +
     "\n" +
+    "		<button class=\"button button-assertive\" ng-click=\"vm.changeLang()\">Change Language</button>\n" +
+    "\n" +
     "	</ion-content>\n" +
     "</ion-view>"
   );
