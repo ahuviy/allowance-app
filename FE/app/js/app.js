@@ -11,7 +11,7 @@
 	wireUpTheStates.$inject = ['$stateProvider', '$urlRouterProvider', 'DEFAULT_LANGUAGE'];
 
 	function wireUpTheStates($stateProvider, $urlRouterProvider, DEFAULT_LANGUAGE) {
-		$urlRouterProvider.otherwise('/:lang');
+		$urlRouterProvider.otherwise('/' + DEFAULT_LANGUAGE);
 		$stateProvider
 			.state('login', {
 				url: '/:lang',

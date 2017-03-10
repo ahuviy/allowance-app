@@ -3,8 +3,8 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    HomeCtrl.$inject = ['dataSrvc', 'overlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc', 'i18nSrvc'];
-    function HomeCtrl(dataSrvc, overlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc, i18nSrvc) {
+    HomeCtrl.$inject = ['dataSrvc', 'overlaySrvc', 'locStoreSrvc', 'locStoreMap', '$scope', 'authSrvc', 'ionErrorHandlerSrvc', 'routeSrvc', 'i18nSrvc', 'websocketSrvc'];
+    function HomeCtrl(dataSrvc, overlaySrvc, locStoreSrvc, locStoreMap, HomeCtrl, authSrvc, ionErrorHandlerSrvc, routeSrvc, i18nSrvc, websocketSrvc) {
         var credentials;
         var LANGUAGES = ['en', 'he'];
 		var $scope = this;
@@ -32,6 +32,8 @@
 				// store parent-name in local-storage
 				locStoreSrvc.store(locStoreMap.PARENT_NAME, res.data.parentName);
 			});
+
+            websocketSrvc.open();
         }
 
         $scope.logout = function() {

@@ -7,6 +7,9 @@ const express = require('express');
 const app = express();
 const config = require('./BE/config');        // contains app global vars
 
+// Initialize WebSocket server
+require('./BE/ws-server');
+
 // Initialize MongoDB database
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');     // enables advanced mongoose promises
