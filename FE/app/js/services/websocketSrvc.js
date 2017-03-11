@@ -25,18 +25,14 @@
                 return;
             }
             socket = new WebSocket(WS_ADDRESS);
-            socket.onmessage = event => {
-                console.log(parseJson(event.data));
-            };
-            socket.onopen = () => {
-                // TODOahuvi: send username to server
-                this.subscribe();
-            };
+            socket.onmessage = event => console.log(parseJson(event.data));
+            socket.onopen = () => subscribe('ahuviTest');
+            socket.onclose = () => socket = null;
         }
 
         function close() {
             if (socket) {
-                socket.onclose = () => socket = null;
+                unsubscribe('ahuviTest');
                 socket.close();
             }
         }
@@ -49,12 +45,18 @@
             socket.send(JSON.stringify(obj));
         }
 
-        function subscribe() {
-            socket.send('start pushing');
+        function subscribe(topic) {
+            send({
+                command: 'REGISTER_TO_TOPIC',
+                topic: topic
+            });
         }
 
-        function unsubscribe() {
-            socket.send('stop pushing');
+        function unsubscribe(topic) {
+            send({
+                command: 'UNREGISTER_FROM_TOPIC',
+                topic: topic
+            });
         }
 
         function parseJson(data) {

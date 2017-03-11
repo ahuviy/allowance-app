@@ -8,7 +8,7 @@ const app = express();
 const config = require('./BE/config');        // contains app global vars
 
 // Initialize WebSocket server
-require('./BE/ws-server');
+const websocketService = require('./BE/websocket-service');
 
 // Initialize MongoDB database
 var mongoose = require('mongoose');
