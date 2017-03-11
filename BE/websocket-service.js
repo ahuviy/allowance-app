@@ -3,12 +3,14 @@ class WebsocketService {
         this.ONE_DAY_IN_MILLISECONDS = 86400000;
         this.ONE_WEEK_IN_MILLISECONDS = 604800000;
         this.topics = {};
-        this.server = require('nodejs-websocket').createServer(conn => {
-            console.log('Established new connection.');
-            conn.on('text', str => this.onText(str, conn));
-            conn.on('close', (code, reason) => this.onClose(code, reason, conn));
-            conn.on('error', err => this.onError(err, conn));
-        }).listen(8080);
+        this.server = require('nodejs-websocket')
+            .createServer(conn => {
+                console.log('Established new connection.');
+                conn.on('text', str => this.onText(str, conn));
+                conn.on('close', (code, reason) => this.onClose(code, reason, conn));
+                conn.on('error', err => this.onError(err, conn));
+            })
+            .listen(8080);
 
         setInterval(this.remOldKeysFromTopics, this.ONE_DAY_IN_MILLISECONDS);
     }
@@ -22,6 +24,14 @@ class WebsocketService {
         switch (msg.command) {
             case 'BROADCAST':
                 this.broadcast(msg.payload, msg.topic);
+                break;
+            case 'ADD_METADATA':
+                this.server.connections.map(conn => {
+                    if (conn.key === connection.key) {
+                        conn.metadata = Object.assign({}, conn.metadata, msg.payload);
+                        console.log('added metadata:', conn.metadata);
+                    }
+                });
                 break;
             case 'REGISTER_TO_TOPIC':
                 this.registerToTopic(msg.topic, connection.key);
